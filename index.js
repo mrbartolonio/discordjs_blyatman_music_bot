@@ -2,12 +2,12 @@ const Discord = require('discord.js')
 const dotenv = require('dotenv')
 const {Player} = require('discord-player')
 const loaderSlashes = require('./src/utils/loadSlash.js')
-const db = require('./src/utils/database.js')
+const {db} = require('./src/utils/database.js')
 dotenv.config()
 const TOKEN = process.env.TOKEN
 
 const client = new Discord.Client({
-  intents: ['GUILDS', 'GUILD_VOICE_STATES'],
+  intents: ['GUILDS', 'GUILD_VOICE_STATES', 'GUILD_MESSAGES'],
 })
 
 client.slashcommands = new Discord.Collection()
@@ -34,6 +34,10 @@ client.on('interactionCreate', (interaction) => {
     await slashcmd.run({client, interaction, db})
   }
   handleCommand()
+})
+
+client.on('messageCreate', (mess) => {
+  console.log(mess.channel.name)
 })
 
 client.login(TOKEN)
