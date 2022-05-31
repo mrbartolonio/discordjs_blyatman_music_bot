@@ -19,6 +19,7 @@
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
     "ffmpeg-static": "^4.4.1",
+    "sqlite3": "^5.0.8",
     "ytdl-core": "^4.11.0"
   },
   "devDependencies": {

@@ -3,7 +3,7 @@ const {REST} = require('@discordjs/rest')
 const fs = require('fs')
 
 module.exports = function loadSlashCommands(client) {
-  console.log(`[LoadSlash module start]`)
+  console.log(`---[LoadSlash module start]---`)
   const CLIENT_ID = process.env.CLIENT_ID
 
   let commands = []

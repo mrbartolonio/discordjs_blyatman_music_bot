@@ -2,7 +2,7 @@ const Discord = require('discord.js')
 const dotenv = require('dotenv')
 const {Player} = require('discord-player')
 const loaderSlashes = require('./src/utils/loadSlash.js')
-
+const db = require('./src/utils/database.js')
 dotenv.config()
 const TOKEN = process.env.TOKEN
 
@@ -31,7 +31,7 @@ client.on('interactionCreate', (interaction) => {
     if (!slashcmd) interaction.reply('Błędna komenda')
 
     await interaction.deferReply({ephemeral: true})
-    await slashcmd.run({client, interaction})
+    await slashcmd.run({client, interaction, db})
   }
   handleCommand()
 })
