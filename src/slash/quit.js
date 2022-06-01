@@ -10,6 +10,7 @@ module.exports = {
 
     if (!queue) return await interaction.editReply('Brak piosenek w kolejce')
 
+    queue.clear()
     queue.destroy()
     await interaction.editReply({
       embeds: [

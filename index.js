@@ -2,7 +2,9 @@ const Discord = require('discord.js')
 const dotenv = require('dotenv')
 const {Player} = require('discord-player')
 const loaderSlashes = require('./src/utils/loadSlash.js')
-const {db} = require('./src/utils/database.js')
+const db = require('./src/utils/database.js')
+const {messListener} = require('./src/modules/message_listener.js')
+
 dotenv.config()
 const TOKEN = process.env.TOKEN
 
@@ -36,8 +38,6 @@ client.on('interactionCreate', (interaction) => {
   handleCommand()
 })
 
-client.on('messageCreate', (mess) => {
-  console.log(mess.channel.name)
-})
+messListener(client)
 
 client.login(TOKEN)
