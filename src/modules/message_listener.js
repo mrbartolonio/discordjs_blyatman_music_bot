@@ -29,4 +29,4 @@ function messListener(client) {
   })
 }
 
-module.exports = {updateVar, messListener}
+module.exports = {updateVar, messListener, dbObj}
