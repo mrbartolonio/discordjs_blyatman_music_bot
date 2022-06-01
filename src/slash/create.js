@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require('@discordjs/builders')
-const {MessageEmbed} = require('discord.js')
+const {MessageActionRow, MessageButton, MessageEmbed} = require('discord.js')
 const {updateVar} = require('../modules/message_listener.js')
 
 module.exports = {
@@ -19,7 +19,45 @@ module.exports = {
         ],
       })
       .then(async (channel) => {
-        let mess = await channel.send('Hello!')
+        const row = new MessageActionRow().addComponents(
+          new MessageButton()
+            .setCustomId('play_pause')
+            .setLabel('⏯️')
+            .setStyle('SECONDARY'),
+          new MessageButton()
+            .setCustomId('skip_song')
+            .setLabel('⏭')
+            .setStyle('SECONDARY'),
+          new MessageButton()
+            .setCustomId('stop_song')
+            .setLabel('⏹')
+            .setStyle('SECONDARY'),
+          new MessageButton()
+            .setCustomId('shuffle_song')
+            .setLabel('🔀')
+            .setStyle('SECONDARY'),
+          new MessageButton()
+            .setCustomId('repeat_song')
+            .setLabel('🔁')
+            .setStyle('SECONDARY'),
+        )
+        let embedPlayer = new MessageEmbed()
+        embedPlayer
+          .setColor('#0099ff')
+          .setTitle('Some title')
+          .setURL('https://discord.js.org/')
+          .setAuthor({
+            name: 'Some name',
+            iconURL: 'https://i.imgur.com/AfFp7pu.png',
+            url: 'https://discord.js.org',
+          })
+          .setDescription('Some description here')
+          .setThumbnail('https://i.imgur.com/AfFp7pu.png')
+        let mess = await channel.send({
+          embeds: [embedPlayer],
+          components: [row],
+        })
+
         let embed = new MessageEmbed()
         embed.setDescription(`Utworzono nowy kanał <#${channel.id}>`)
         await interaction.editReply({
