@@ -23,6 +23,10 @@ client.player = new Player(client, {
 })
 
 client.on('ready', () => {
+  client.user.setActivity({
+    name: '🎶 | Music Time',
+    type: 'LISTENING',
+  })
   loaderSlashes(client)
   console.log(`Zalogowany jako: ${client.user.tag}`)
 })
@@ -45,8 +49,7 @@ client.on('interactionCreate', (interaction) => {
   handleCommand()
   handleButton()
 })
-
-updater(client.player)
+updater(client.player, client.channels)
 messListener(client)
 
 client.login(TOKEN)

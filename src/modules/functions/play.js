@@ -35,7 +35,9 @@ async function play(user, content, channel, guild, vc, client) {
               }, 3000)
             })
           } else {
-            const queue = await client.player.createQueue(guild)
+            const queue = await client.player.createQueue(guild, {
+              leaveOnEmptyCooldown: 100000,
+            })
             if (!queue.connection) await queue.connect(vc)
             const playlist = result.playlist
             await queue.addTracks(result.tracks)
@@ -54,7 +56,9 @@ async function play(user, content, channel, guild, vc, client) {
           }
         } else {
           //video yt
-          const queue = await client.player.createQueue(guild)
+          const queue = await client.player.createQueue(guild, {
+            leaveOnEmptyCooldown: 100000,
+          })
           if (!queue.connection) await queue.connect(vc)
           const result = await client.player.search(content, {
             requestedBy: user,
@@ -108,7 +112,9 @@ async function play(user, content, channel, guild, vc, client) {
               }, 3000)
             })
           } else {
-            const queue = await client.player.createQueue(guild)
+            const queue = await client.player.createQueue(guild, {
+              leaveOnEmptyCooldown: 100000,
+            })
             if (!queue.connection) await queue.connect(vc)
             const playlist = result.playlist
             await queue.addTracks(result.tracks)
@@ -131,7 +137,9 @@ async function play(user, content, channel, guild, vc, client) {
           )
         ) {
           //utwór
-          const queue = await client.player.createQueue(guild)
+          const queue = await client.player.createQueue(guild, {
+            leaveOnEmptyCooldown: 100000,
+          })
           if (!queue.connection) await queue.connect(vc)
           const result = await client.player.search(content, {
             requestedBy: user,
@@ -181,7 +189,9 @@ async function play(user, content, channel, guild, vc, client) {
               }, 3000)
             })
           } else {
-            const queue = await client.player.createQueue(guild)
+            const queue = await client.player.createQueue(guild, {
+              leaveOnEmptyCooldown: 100000,
+            })
             if (!queue.connection) await queue.connect(vc)
             const playlist = result.playlist
             await queue.addTracks(result.tracks)
@@ -202,7 +212,9 @@ async function play(user, content, channel, guild, vc, client) {
       }
     } else {
       //wyszukiwarka yt
-      const queue = await client.player.createQueue(guild)
+      const queue = await client.player.createQueue(guild, {
+        leaveOnEmptyCooldown: 100000,
+      })
       if (!queue.connection) await queue.connect(vc)
       const result = await client.player.search(content, {
         requestedBy: user,
