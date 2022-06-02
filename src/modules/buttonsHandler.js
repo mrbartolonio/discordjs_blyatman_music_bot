@@ -6,7 +6,7 @@ const shuffleButton = require('./functions/shuffleButton')
 const repeatButton = require('./functions/repeatButton')
 
 async function handler(interaction, player, client) {
-  if (dbObj[interaction.guildId].channel == interaction.channelId) {
+  if (dbObj[interaction.guildId]?.channel == interaction.channelId) {
     switch (interaction.customId) {
       case 'play_pause':
         playPauseButton(interaction, player, client)
