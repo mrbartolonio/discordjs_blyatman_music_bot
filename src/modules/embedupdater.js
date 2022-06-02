@@ -3,15 +3,15 @@ let {dbObj} = require('./message_listener')
 async function updater(client, player, channels) {
   console.log(`---[EmbedUpdater module start]---`)
 
-  player.on('trackStart', async (queue, track) => {
+  player.on('trackStart', async (queue) => {
     updateEmbed(queue, client, channels)
   })
 
-  player.on('trackAdd', async (queue, track) => {
+  player.on('trackAdd', async (queue) => {
     updateEmbed(queue, client, channels)
   })
 
-  player.on('tracksAdd', async (queue, track) => {
+  player.on('tracksAdd', async (queue) => {
     updateEmbed(queue, client, channels)
   })
 

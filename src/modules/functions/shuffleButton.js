@@ -1,7 +1,7 @@
 const {MessageEmbed} = require('discord.js')
 const {updateEmbed} = require('../embedupdater')
 
-async function shuffleButton(interaction, player, client) {
+async function shuffleButton(interaction, player) {
   const queue = player.getQueue(interaction.guildId)
   if (!queue) {
     await interaction.reply({

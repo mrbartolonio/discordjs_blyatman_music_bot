@@ -15,10 +15,12 @@ async function play(user, content, channel, guild, vc, client, dbObj) {
   } else {
     if (validURL(content)) {
       if (
+        // eslint-disable-next-line no-useless-escape
         /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/.test(
           content,
         )
       ) {
+        // eslint-disable-next-line no-useless-escape
         if (/^.*(youtu.be\/|playlist?)([^#\&\?]*).*/.test(content)) {
           //playlista yt
           const result = await client.player.search(content, {

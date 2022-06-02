@@ -1,7 +1,7 @@
 const {MessageEmbed} = require('discord.js')
 const {updateEmbed} = require('../embedupdater')
 
-async function playPauseButton(interaction, player, client) {
+async function playPauseButton(interaction, player) {
   const queue = player.getQueue(interaction.guildId)
   if (!queue) {
     await interaction.reply({
