@@ -1,7 +1,7 @@
 const {MessageEmbed} = require('discord.js')
 const {QueryType} = require('discord-player')
 
-async function play(user, content, channel, guild, vc, client) {
+async function play(user, content, channel, guild, vc, client, dbObj) {
   if (!vc) {
     let embed = new MessageEmbed()
     embed.setDescription(
@@ -36,7 +36,7 @@ async function play(user, content, channel, guild, vc, client) {
             })
           } else {
             const queue = await client.player.createQueue(guild, {
-              leaveOnEmptyCooldown: 100000,
+              metadata: await getMessage(client, guild, dbObj),
             })
             if (!queue.connection) await queue.connect(vc)
             const playlist = result.playlist
@@ -57,7 +57,7 @@ async function play(user, content, channel, guild, vc, client) {
         } else {
           //video yt
           const queue = await client.player.createQueue(guild, {
-            leaveOnEmptyCooldown: 100000,
+            metadata: await getMessage(client, guild, dbObj),
           })
           if (!queue.connection) await queue.connect(vc)
           const result = await client.player.search(content, {
@@ -113,7 +113,7 @@ async function play(user, content, channel, guild, vc, client) {
             })
           } else {
             const queue = await client.player.createQueue(guild, {
-              leaveOnEmptyCooldown: 100000,
+              metadata: await getMessage(client, guild, dbObj),
             })
             if (!queue.connection) await queue.connect(vc)
             const playlist = result.playlist
@@ -138,7 +138,7 @@ async function play(user, content, channel, guild, vc, client) {
         ) {
           //utwór
           const queue = await client.player.createQueue(guild, {
-            leaveOnEmptyCooldown: 100000,
+            metadata: await getMessage(client, guild, dbObj),
           })
           if (!queue.connection) await queue.connect(vc)
           const result = await client.player.search(content, {
@@ -190,7 +190,7 @@ async function play(user, content, channel, guild, vc, client) {
             })
           } else {
             const queue = await client.player.createQueue(guild, {
-              leaveOnEmptyCooldown: 100000,
+              metadata: await getMessage(client, guild, dbObj),
             })
             if (!queue.connection) await queue.connect(vc)
             const playlist = result.playlist
@@ -213,7 +213,7 @@ async function play(user, content, channel, guild, vc, client) {
     } else {
       //wyszukiwarka yt
       const queue = await client.player.createQueue(guild, {
-        leaveOnEmptyCooldown: 100000,
+        metadata: await getMessage(client, guild, dbObj),
       })
       if (!queue.connection) await queue.connect(vc)
       const result = await client.player.search(content, {
@@ -261,4 +261,10 @@ function validURL(str) {
     'i',
   ) // fragment locator
   return !!pattern.test(str)
+}
+
+async function getMessage(client, guild, dbObj) {
+  return await client.channels.cache
+    .get(dbObj[guild].channel)
+    .messages.fetch(dbObj[guild].message)
 }

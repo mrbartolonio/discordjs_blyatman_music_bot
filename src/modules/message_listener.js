@@ -22,6 +22,7 @@ function messListener(client) {
           mess.guildId,
           mess.member.voice.channel,
           client,
+          dbObj,
         )
         mess.delete()
       }

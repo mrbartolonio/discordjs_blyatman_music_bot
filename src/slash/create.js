@@ -1,7 +1,7 @@
 const {SlashCommandBuilder} = require('@discordjs/builders')
 const {MessageActionRow, MessageButton, MessageEmbed} = require('discord.js')
 const {updateVar} = require('../modules/message_listener.js')
-
+const {defaultEmbed} = require('../modules/embedupdater')
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('createchannel')
@@ -41,20 +41,8 @@ module.exports = {
             .setLabel('🔁')
             .setStyle('SECONDARY'),
         )
-        let embedPlayer = new MessageEmbed()
-        embedPlayer
-          .setColor('#0099ff')
-          .setTitle('Some title')
-          .setURL('https://discord.js.org/')
-          .setAuthor({
-            name: 'Some name',
-            iconURL: 'https://i.imgur.com/AfFp7pu.png',
-            url: 'https://discord.js.org',
-          })
-          .setDescription('Some description here')
-          .setThumbnail('https://i.imgur.com/AfFp7pu.png')
         let mess = await channel.send({
-          embeds: [embedPlayer],
+          embeds: [defaultEmbed],
           components: [row],
         })
 

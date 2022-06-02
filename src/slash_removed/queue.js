@@ -34,7 +34,6 @@ module.exports = {
         } -- <@${song.requestedBy.id}>`
       })
       .join('\n')
-
     const currentSong = queue.current
 
     await interaction.editReply({

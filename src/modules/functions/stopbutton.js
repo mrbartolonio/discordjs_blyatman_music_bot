@@ -1,7 +1,7 @@
 const {MessageEmbed} = require('discord.js')
-const {updateEmbed} = require('../embedupdater')
+const {setDefEmbed} = require('../embedupdater')
 
-async function skipButton(interaction, player, client) {
+async function stopButton(interaction, player, channels) {
   const queue = player.getQueue(interaction.guildId)
   if (!queue) {
     await interaction.reply({
@@ -19,15 +19,13 @@ async function skipButton(interaction, player, client) {
       interaction.deleteReply()
     }, 5000)
   } else {
-    const currentSong = queue.current
-
-    await queue.skip()
-    await updateEmbed(queue)
+    await setDefEmbed(queue, channels)
+    queue.clear()
+    queue.destroy()
     await interaction.reply({
       embeds: [
         new MessageEmbed()
-          .setDescription(`${currentSong.title} pominięto!`)
-          .setThumbnail(currentSong.thumbnail)
+          .setDescription(`Zatrzymano kolejkę`)
           .setTimestamp()
           .setFooter({
             text: `${interaction.user.username}`,
@@ -41,4 +39,4 @@ async function skipButton(interaction, player, client) {
   }
 }
 
-module.exports = skipButton
+module.exports = stopButton

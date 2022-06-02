@@ -1,27 +1,31 @@
 let {dbObj} = require('./message_listener')
 const skipButton = require('./functions/skipButton')
+const stopButton = require('./functions/stopbutton')
+const playPauseButton = require('./functions/playPauseButton')
+const shuffleButton = require('./functions/shuffleButton')
+const repeatButton = require('./functions/repeatButton')
 
-function handler(interaction) {
+async function handler(interaction, player, client) {
   if (dbObj[interaction.guildId].channel == interaction.channelId) {
     switch (interaction.customId) {
       case 'play_pause':
-        skipButton(interaction)
+        playPauseButton(interaction, player, client)
         break
 
       case 'skip_song':
-        skipButton(interaction)
+        skipButton(interaction, player, client)
         break
 
       case 'stop_song':
-        skipButton(interaction)
+        stopButton(interaction, player, client.channels)
         break
 
       case 'shuffle_song':
-        skipButton(interaction)
+        shuffleButton(interaction, player, client)
         break
 
       case 'repeat_song':
-        skipButton(interaction)
+        repeatButton(interaction, player, client)
         break
 
       default:

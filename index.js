@@ -4,7 +4,7 @@ const {Player} = require('discord-player')
 const loaderSlashes = require('./src/utils/loadSlash.js')
 const db = require('./src/utils/database.js')
 const {messListener} = require('./src/modules/message_listener.js')
-const updater = require('./src/modules/embedupdater.js')
+const {updater} = require('./src/modules/embedupdater.js')
 const btnHandl = require('./src/modules/buttonsHandler.js')
 
 dotenv.config()
@@ -24,7 +24,7 @@ client.player = new Player(client, {
 
 client.on('ready', () => {
   client.user.setActivity({
-    name: '🎶 | Music Time',
+    name: '🎶 | Rozkręcamy tą imprezę!',
     type: 'LISTENING',
   })
   loaderSlashes(client)
@@ -34,7 +34,7 @@ client.on('ready', () => {
 client.on('interactionCreate', (interaction) => {
   async function handleButton() {
     if (!interaction.isButton()) return
-    btnHandl(interaction)
+    await btnHandl(interaction, client.player, client)
   }
 
   async function handleCommand() {
@@ -49,7 +49,7 @@ client.on('interactionCreate', (interaction) => {
   handleCommand()
   handleButton()
 })
-updater(client.player, client.channels)
+updater(client, client.player, client.channels)
 messListener(client)
 
 client.login(TOKEN)
