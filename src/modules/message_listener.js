@@ -13,7 +13,7 @@ function updateVar(guild, message, channel) {
 function messListener(client) {
   console.log(`---[messageListener module start]---`)
   client.on('messageCreate', (mess) => {
-    if (dbObj[mess.guildId].channel == mess.channel.id) {
+    if (dbObj[mess.guildId]?.channel == mess.channel.id) {
       if (!mess.member.user.bot) {
         play(
           mess.member.user,
