@@ -2,8 +2,8 @@ const {Routes} = require('discord-api-types/v9')
 const {REST} = require('@discordjs/rest')
 const fs = require('fs')
 
-module.exports = function loadSlashCommands(client) {
-  console.log(`---[LoadSlash module start]---`)
+module.exports = function loadSlashCommands(client, guildId) {
+  // console.log(`---[LoadSlash module start]---`)
   const CLIENT_ID = process.env.CLIENT_ID
 
   let commands = []
@@ -19,17 +19,34 @@ module.exports = function loadSlashCommands(client) {
 
   const rest = new REST({version: '9'}).setToken(process.env.TOKEN)
   console.log("Deploy'owanie komend")
-  let ids = client.guilds.cache.map((g) => g.id) || 'None'
-  for (let i = 0; i < ids.length; i++) {
+  if (guildId) {
     rest
-      .put(Routes.applicationGuildCommands(CLIENT_ID, ids[i]), {body: commands})
+      .put(Routes.applicationGuildCommands(CLIENT_ID, guildId), {
+        body: commands,
+      })
       .then(() => {
-        console.log(`Zakończono deploy dla Guilda : ${ids[i]}`)
+        console.log(`Zakończono deploy dla Guilda : ${guildId}`)
       })
       .catch((err) => {
         if (err) {
           console.log(err)
         }
       })
+  } else {
+    let ids = client.guilds.cache.map((g) => g.id) || 'None'
+    for (let i = 0; i < ids.length; i++) {
+      rest
+        .put(Routes.applicationGuildCommands(CLIENT_ID, ids[i]), {
+          body: commands,
+        })
+        .then(() => {
+          console.log(`Zakończono deploy dla Guilda : ${ids[i]}`)
+        })
+        .catch((err) => {
+          if (err) {
+            console.log(err)
+          }
+        })
+    }
   }
 }

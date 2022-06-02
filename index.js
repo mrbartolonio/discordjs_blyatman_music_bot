@@ -21,7 +21,10 @@ client.player = new Player(client, {
     highWaterMark: 1 << 25,
   },
 })
-
+client.on('guildCreate', (guild) => {
+  console.log('Joined a new guild: ' + guild.name)
+  loaderSlashes(client, guild.id)
+})
 client.on('ready', () => {
   client.user.setActivity({
     name: '🎶 | Rozkręcamy tą imprezę!',
