@@ -7,7 +7,7 @@ module.exports = {
     .setName('createchannel')
     .setDefaultPermission(false)
     .setDescription('Tworzy kanał odtwarzacza'),
-  run: async ({interaction, db}) => {
+  run: async ({interaction, connection}) => {
     await interaction.guild.channels
       .create('dj_blyatman', {
         type: 'text',
@@ -51,9 +51,46 @@ module.exports = {
         await interaction.editReply({
           embeds: [embed],
         })
-        await db.run(
+        /*         await db.run(
           `INSERT INTO data(guild, channel, message) VALUES("${mess.guildId}", "${channel.id}", "${mess.id}") ON CONFLICT(guild) DO UPDATE SET channel="${channel.id}", message="${mess.id}"`,
         )
+ */
+        try {
+          await connection.query(
+            `SELECT * FROM data WHERE guild = "${mess.guildId}"`,
+            async (err, result) => {
+              if (err) throw err
+              if (result.length >= 1) {
+                await connection.query(
+                  `UPDATE data SET channel="${channel.id}", message="${mess.id}" WHERE guild ="${mess.guildId}"`,
+                  (err, result) => {
+                    if (err) throw err
+                    if (result.affectedRows >= 1) {
+                      console.log('inserted val!')
+                    } else {
+                      console.log('err?!')
+                    }
+                  },
+                )
+              } else {
+                await connection.query(
+                  `INSERT INTO data(guild,channel,message) values ("${mess.guildId}", "${channel.id}", "${mess.id}")`,
+                  (err, result) => {
+                    if (err) throw err
+                    if (result.affectedRows >= 1) {
+                      console.log('inserted val!')
+                    } else {
+                      console.log('err?!')
+                    }
+                  },
+                )
+              }
+            },
+          )
+        } catch (error) {
+          console.log(`Error: ${error}`)
+        }
+
         updateVar(mess.guildId, mess.id, channel.id)
       })
     //created channel id //  console.log(channel.id)
