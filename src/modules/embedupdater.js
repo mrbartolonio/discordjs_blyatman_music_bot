@@ -52,10 +52,7 @@ async function updater(client, player, channels) {
     }
   })
 
-  player.on('error', (queue, error) => {
-    setDefEmbed(queue, channels)
-    console.log(`Wystąpił błąd:  ` + error)
-  })
+  player.on('error', (queue, error) => console.log(`Wystąpił błąd:  ` + error))
 }
 
 async function updateEmbed(queue) {

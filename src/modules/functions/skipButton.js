@@ -22,6 +22,7 @@ async function skipButton(interaction, player) {
     const currentSong = queue.current
 
     await queue.skip()
+    await updateEmbed(queue)
     await interaction.reply({
       embeds: [
         new MessageEmbed()
@@ -37,7 +38,6 @@ async function skipButton(interaction, player) {
     setTimeout(() => {
       interaction.deleteReply()
     }, 5000)
-    await updateEmbed(queue)
   }
 }
 
