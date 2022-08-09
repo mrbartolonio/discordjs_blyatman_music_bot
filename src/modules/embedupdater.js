@@ -46,7 +46,11 @@ async function updater(client, player, channels) {
       })
   })
 
-  //  player.on('trackEnd', (queue, track) => console.log('skonczyl sie traczek'))
+  player.on('trackEnd', (queue, track) => {
+    if (queue.tracks.length <= 0) {
+      setDefEmbed(queue, channels)
+    }
+  })
 
   player.on('error', (queue, error) => {
     setDefEmbed(queue, channels)
