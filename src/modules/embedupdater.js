@@ -1,4 +1,4 @@
-const {MessageEmbed} = require('discord.js')
+const {EmbedBuilder} = require('discord.js')
 let {dbObj} = require('./message_listener')
 async function updater(client, player, channels) {
   console.log(`---[EmbedUpdater module start]---`)
@@ -16,7 +16,7 @@ async function updater(client, player, channels) {
   })
 
   player.on('botDisconnect', (queue) => {
-    let embedPlayer = new MessageEmbed()
+    let embedPlayer = new EmbedBuilder()
     embedPlayer
       .setColor('#0099ff')
       .setDescription('No i co ty sobą reprezentujesz?!')
@@ -32,7 +32,7 @@ async function updater(client, player, channels) {
   })
 
   player.on('channelEmpty', (queue) => {
-    let embedPlayer = new MessageEmbed()
+    let embedPlayer = new EmbedBuilder()
     setDefEmbed(queue, channels)
     embedPlayer.setColor('#0099ff').setDescription('To ja spierdalam, naura!')
 
@@ -69,7 +69,7 @@ async function updateEmbed(queue) {
         }](${song.url}) -- <@${song.requestedBy.id}>`
       })
       .join('\n')
-    let embedPlayer = new MessageEmbed()
+    let embedPlayer = new EmbedBuilder()
     let size = Object.keys(qq.tracks).length
 
     embedPlayer
@@ -132,7 +132,7 @@ function getNameRepeat(mode) {
   }
 }
 
-const defaultEmbed = new MessageEmbed()
+const defaultEmbed = new EmbedBuilder()
   .setAuthor({name: 'Odtwarzacz'})
   .setColor('#0099ff')
   .setDescription('Kolejka w tym momencie jest pusta')

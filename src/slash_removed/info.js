@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require('@discordjs/builders')
-const {MessageEmbed} = require('discord.js')
+const {EmbedBuilder} = require('discord.js')
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -19,7 +19,7 @@ module.exports = {
 
     await interaction.editReply({
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setThumbnail(song.thumbnail)
           .setDescription(
             `Teraz Grane: [${song.title}](${song.url})\n\n` + bar,

@@ -1,9 +1,9 @@
-const {MessageEmbed} = require('discord.js')
+const {EmbedBuilder} = require('discord.js')
 const {QueryType} = require('discord-player')
 
 async function play(user, content, channel, guild, vc, client, dbObj) {
   if (!vc) {
-    let embed = new MessageEmbed()
+    let embed = new EmbedBuilder()
     embed.setDescription(
       `Musisz przebywać na kanale głosowym, aby korzystać z tej funkcji`,
     )
@@ -29,7 +29,7 @@ async function play(user, content, channel, guild, vc, client, dbObj) {
           })
 
           if (result.tracks.length === 0) {
-            let embed = new MessageEmbed()
+            let embed = new EmbedBuilder()
             embed.setDescription(`Brak wyników`)
             channel.send({embeds: [embed]}).then((sent) => {
               setTimeout(() => {
@@ -44,7 +44,7 @@ async function play(user, content, channel, guild, vc, client, dbObj) {
             const playlist = result.playlist
             await queue.addTracks(result.tracks)
             if (!queue.playing) await queue.play()
-            let embed = new MessageEmbed()
+            let embed = new EmbedBuilder()
             embed
               .setDescription(
                 `**${result.tracks.length} piosenek z [${playlist.title}](${playlist.url})** zostało dodanych do kolejki`,
@@ -67,7 +67,7 @@ async function play(user, content, channel, guild, vc, client, dbObj) {
             searchEngine: QueryType.YOUTUBE_VIDEO,
           })
           if (result.tracks.length === 0) {
-            let embed = new MessageEmbed()
+            let embed = new EmbedBuilder()
             embed.setDescription(`Brak wyników`)
             channel.send({embeds: [embed]}).then((sent) => {
               setTimeout(() => {
@@ -78,7 +78,7 @@ async function play(user, content, channel, guild, vc, client, dbObj) {
             const song = result.tracks[0]
             await queue.addTrack(song)
             if (!queue.playing) await queue.play()
-            let embed = new MessageEmbed()
+            let embed = new EmbedBuilder()
             embed
               .setDescription(
                 `**[${song.title}](${song.url})** dodany do kolejki`,
@@ -106,7 +106,7 @@ async function play(user, content, channel, guild, vc, client, dbObj) {
           })
 
           if (result.tracks.length === 0) {
-            let embed = new MessageEmbed()
+            let embed = new EmbedBuilder()
             embed.setDescription(`Brak wyników`)
             channel.send({embeds: [embed]}).then((sent) => {
               setTimeout(() => {
@@ -121,7 +121,7 @@ async function play(user, content, channel, guild, vc, client, dbObj) {
             const playlist = result.playlist
             await queue.addTracks(result.tracks)
             if (!queue.playing) await queue.play()
-            let embed = new MessageEmbed()
+            let embed = new EmbedBuilder()
             embed
               .setDescription(
                 `**${result.tracks.length} piosenek z [${playlist.title}](${playlist.url})** zostało dodanych do kolejki`,
@@ -148,7 +148,7 @@ async function play(user, content, channel, guild, vc, client, dbObj) {
             searchEngine: QueryType.SPOTIFY_SONG,
           })
           if (result.tracks.length === 0) {
-            let embed = new MessageEmbed()
+            let embed = new EmbedBuilder()
             embed.setDescription(`Brak wyników`)
             channel.send({embeds: [embed]}).then((sent) => {
               setTimeout(() => {
@@ -159,7 +159,7 @@ async function play(user, content, channel, guild, vc, client, dbObj) {
             const song = result.tracks[0]
             await queue.addTrack(song)
             if (!queue.playing) await queue.play()
-            let embed = new MessageEmbed()
+            let embed = new EmbedBuilder()
             embed
               .setDescription(
                 `**[${song.title}](${song.url})** dodany do kolejki`,
@@ -183,7 +183,7 @@ async function play(user, content, channel, guild, vc, client, dbObj) {
           })
 
           if (result.tracks.length === 0) {
-            let embed = new MessageEmbed()
+            let embed = new EmbedBuilder()
             embed.setDescription(`Brak wyników`)
             channel.send({embeds: [embed]}).then((sent) => {
               setTimeout(() => {
@@ -198,7 +198,7 @@ async function play(user, content, channel, guild, vc, client, dbObj) {
             const playlist = result.playlist
             await queue.addTracks(result.tracks)
             if (!queue.playing) await queue.play()
-            let embed = new MessageEmbed()
+            let embed = new EmbedBuilder()
             embed
               .setDescription(
                 `**${result.tracks.length} piosenek z [${playlist.title}](${playlist.url})** zostało dodanych do kolejki`,
@@ -224,7 +224,7 @@ async function play(user, content, channel, guild, vc, client, dbObj) {
       })
 
       if (result.tracks.length === 0) {
-        let embed = new MessageEmbed()
+        let embed = new EmbedBuilder()
         embed.setDescription(`Brak wyników wyszukiwania`)
         channel.send({embeds: [embed]}).then((sent) => {
           setTimeout(() => {
@@ -235,7 +235,7 @@ async function play(user, content, channel, guild, vc, client, dbObj) {
         const song = result.tracks[0]
         await queue.addTrack(song)
         if (!queue.playing) await queue.play()
-        let embed = new MessageEmbed()
+        let embed = new EmbedBuilder()
         embed
           .setDescription(`**[${song.title}](${song.url})** dodany do kolejki`)
           .setThumbnail(song.thumbnail)

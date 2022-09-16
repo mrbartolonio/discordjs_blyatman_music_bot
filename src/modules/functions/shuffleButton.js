@@ -1,4 +1,4 @@
-const {MessageEmbed} = require('discord.js')
+const {EmbedBuilder} = require('discord.js')
 const {updateEmbed} = require('../embedupdater')
 
 async function shuffleButton(interaction, player) {
@@ -6,7 +6,7 @@ async function shuffleButton(interaction, player) {
   if (!queue) {
     await interaction.reply({
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setDescription(`Brak piosenek w kolejce!`)
           .setFooter({
             text: `${interaction.user.username}`,

@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require('@discordjs/builders')
-const {MessageActionRow, MessageButton, MessageEmbed} = require('discord.js')
+const {MessageActionRow, MessageButton, EmbedBuilder} = require('discord.js')
 const {updateVar} = require('../modules/message_listener.js')
 const {defaultEmbed} = require('../modules/embedupdater')
 module.exports = {
@@ -46,7 +46,7 @@ module.exports = {
           components: [row],
         })
 
-        let embed = new MessageEmbed()
+        let embed = new EmbedBuilder()
         embed.setDescription(`Utworzono nowy kanał <#${channel.id}>`)
         await interaction.editReply({
           embeds: [embed],

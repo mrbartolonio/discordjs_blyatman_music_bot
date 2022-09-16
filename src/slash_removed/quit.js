@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require('@discordjs/builders')
-const {MessageEmbed} = require('discord.js')
+const {EmbedBuilder} = require('discord.js')
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -14,7 +14,7 @@ module.exports = {
     queue.destroy()
     await interaction.editReply({
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setImage('https://i.giphy.com/media/w89ak63KNl0nJl80ig/giphy.gif')
           .setDescription('Naura'),
       ],

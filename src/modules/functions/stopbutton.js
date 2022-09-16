@@ -1,4 +1,4 @@
-const {MessageEmbed} = require('discord.js')
+const {EmbedBuilder} = require('discord.js')
 const {setDefEmbed} = require('../embedupdater')
 
 async function stopButton(interaction, player, channels) {
@@ -6,7 +6,7 @@ async function stopButton(interaction, player, channels) {
   if (!queue) {
     await interaction.reply({
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setDescription(`Brak piosenek w kolejce!`)
           .setFooter({
             text: `${interaction.user.username}`,
@@ -15,16 +15,15 @@ async function stopButton(interaction, player, channels) {
           .setTimestamp(),
       ],
     })
-    setTimeout(() => {
-      interaction.deleteReply()
+    setTimeout(async () => {
+      await interaction.deleteReply()
     }, 5000)
   } else {
-    await setDefEmbed(queue, channels)
-    queue.clear()
-    queue.destroy()
+    await queue.clear()
+    await queue.destroy()
     await interaction.reply({
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setDescription(`Zatrzymano kolejkę`)
           .setTimestamp()
           .setFooter({
@@ -33,8 +32,9 @@ async function stopButton(interaction, player, channels) {
           }),
       ],
     })
-    setTimeout(() => {
-      interaction.deleteReply()
+    await setDefEmbed(queue, channels)
+    setTimeout(async () => {
+      await interaction.deleteReply()
     }, 5000)
   }
 }

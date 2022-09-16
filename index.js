@@ -1,4 +1,4 @@
-const Discord = require('discord.js')
+const {Client, GatewayIntentBits, Collection} = require('discord.js')
 const dotenv = require('dotenv')
 const {Player} = require('discord-player')
 const loaderSlashes = require('./src/utils/loadSlash.js')
@@ -10,11 +10,20 @@ const btnHandl = require('./src/modules/buttonsHandler.js')
 dotenv.config()
 const TOKEN = process.env.TOKEN
 
-const client = new Discord.Client({
+/* const client = new Client({
   intents: ['GUILDS', 'GUILD_VOICE_STATES', 'GUILD_MESSAGES'],
 })
+ */
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+})
 
-client.slashcommands = new Discord.Collection()
+client.slashcommands = new Collection()
 client.player = new Player(client, {
   ytdlOptions: {
     quality: 'highestaudio',
