@@ -1,5 +1,10 @@
 const {SlashCommandBuilder} = require('@discordjs/builders')
-const {ButtonBuilder, EmbedBuilder, ActionRowBuilder} = require('discord.js')
+const {
+  ButtonBuilder,
+  EmbedBuilder,
+  ActionRowBuilder,
+  PermissionsBitField,
+} = require('discord.js')
 const {updateVar} = require('../modules/message_listener.js')
 const {defaultEmbed} = require('../modules/embedupdater')
 module.exports = {
@@ -14,7 +19,11 @@ module.exports = {
         permissionOverwrites: [
           {
             id: interaction.guild.id,
-            allow: ['VIEW_CHANNEL', 'SEND_MESSAGES', 'READ_MESSAGE_HISTORY'],
+            allow: [
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.ReadMessageHistory,
+              PermissionsBitField.Flags.SendMessages,
+            ],
           },
         ],
       })
@@ -23,23 +32,23 @@ module.exports = {
           new ButtonBuilder()
             .setCustomId('play_pause')
             .setLabel('⏯️')
-            .setStyle('SECONDARY'),
+            .setStyle('Secondary'),
           new ButtonBuilder()
             .setCustomId('skip_song')
             .setLabel('⏭')
-            .setStyle('SECONDARY'),
+            .setStyle('Secondary'),
           new ButtonBuilder()
             .setCustomId('stop_song')
             .setLabel('⏹')
-            .setStyle('SECONDARY'),
+            .setStyle('Secondary'),
           new ButtonBuilder()
             .setCustomId('shuffle_song')
             .setLabel('🔀')
-            .setStyle('SECONDARY'),
+            .setStyle('Secondary'),
           new ButtonBuilder()
             .setCustomId('repeat_song')
             .setLabel('🔁')
-            .setStyle('SECONDARY'),
+            .setStyle('Secondary'),
         )
         let mess = await channel.send({
           embeds: [defaultEmbed],
