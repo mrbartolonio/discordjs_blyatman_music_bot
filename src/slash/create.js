@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require('@discordjs/builders')
-const {MessageActionRow, MessageButton, EmbedBuilder} = require('discord.js')
+const {ButtonBuilder, EmbedBuilder, ActionRowBuilder} = require('discord.js')
 const {updateVar} = require('../modules/message_listener.js')
 const {defaultEmbed} = require('../modules/embedupdater')
 module.exports = {
@@ -9,8 +9,8 @@ module.exports = {
     .setDescription('Tworzy kanał odtwarzacza'),
   run: async ({interaction, connection}) => {
     await interaction.guild.channels
-      .create('dj_blyatman', {
-        type: 'text',
+      .create({
+        name: 'dj_blyatman',
         permissionOverwrites: [
           {
             id: interaction.guild.id,
@@ -19,24 +19,24 @@ module.exports = {
         ],
       })
       .then(async (channel) => {
-        const row = new MessageActionRow().addComponents(
-          new MessageButton()
+        const row = new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
             .setCustomId('play_pause')
             .setLabel('⏯️')
             .setStyle('SECONDARY'),
-          new MessageButton()
+          new ButtonBuilder()
             .setCustomId('skip_song')
             .setLabel('⏭')
             .setStyle('SECONDARY'),
-          new MessageButton()
+          new ButtonBuilder()
             .setCustomId('stop_song')
             .setLabel('⏹')
             .setStyle('SECONDARY'),
-          new MessageButton()
+          new ButtonBuilder()
             .setCustomId('shuffle_song')
             .setLabel('🔀')
             .setStyle('SECONDARY'),
-          new MessageButton()
+          new ButtonBuilder()
             .setCustomId('repeat_song')
             .setLabel('🔁')
             .setStyle('SECONDARY'),
