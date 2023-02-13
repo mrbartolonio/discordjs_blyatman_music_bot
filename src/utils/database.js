@@ -1,30 +1,23 @@
-const sqlite3 = require('sqlite3').verbose()
+const {PrismaClient} = require('@prisma/client')
 const {updateVar} = require('../modules/message_listener')
+let prisma
 
-console.log(`---[Database module start]---`)
-
-const db = new sqlite3.Database(__dirname + '/../database/sqlite.db', (err) => {
-  if (err) {
-    console.log('Could not connect to sqlite database', err)
-  } else {
-    console.log('Connected to sqlite database')
+// this is needed because in development we don't want to restart
+// the server with every change, but we want to make sure we don't
+// create a new connection to the DB with every change either.
+// in production we'll have a single connection to the DB.
+if (process.env.NODE_ENV === 'production') {
+  prisma = new PrismaClient()
+} else {
+  if (!global.__db__) {
+    global.__db__ = new PrismaClient()
   }
-})
+  prisma = global.__db__
+  prisma.$connect()
+}
 
-db.run(
-  'CREATE TABLE IF NOT EXISTS data(id INTEGER PRIMARY KEY AUTOINCREMENT,guild VARCHAR(40) UNIQUE,channel VARCHAR(40),message VARCHAR(40))',
-  (err) => {
-    if (err) return console.log(err)
-  },
-)
+prisma.data
+  .findMany()
+  .then((data) => data.map((g) => updateVar(g.guild, g.message, g.channel)))
 
-db.all('SELECT * FROM data', async (err, rows) => {
-  if (err) return console.log(err.message)
-  if (rows.length > 0) {
-    for (let i = 0; i < rows.length; i++) {
-      updateVar(rows[i].guild, rows[i].message, rows[i].channel)
-    }
-  }
-})
-
-module.exports = db
+module.exports = prisma

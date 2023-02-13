@@ -8,6 +8,8 @@ ENV VOLTA_HOME /root/.volta
 ENV PATH /root/.volta/bin:$PATH
 RUN volta install node@${NODE_VERSION}
 
+RUN apt-get update && apt-get install -y sqlite3
+
 #######################################################################
 
 RUN mkdir /app
@@ -20,6 +22,7 @@ WORKDIR /app
 ENV NODE_ENV production
 
 COPY . .
+RUN npx prisma generate
 
 RUN npm install
 FROM debian:bullseye
@@ -32,5 +35,6 @@ COPY --from=builder /app /app
 WORKDIR /app
 ENV NODE_ENV production
 ENV PATH /root/.volta/bin:$PATH
+ENV DATABASE_URL=file:/data/sqlite.db
 
-CMD [ "npm", "run", "start" ]
+ENTRYPOINT [ "./start.sh" ]

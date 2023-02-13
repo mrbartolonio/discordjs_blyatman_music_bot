@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "setup": "prisma generate && prisma migrate deploy",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,15 +16,15 @@
     "@discordjs/opus": "^0.8.0",
     "@discordjs/rest": "^1.1.0",
     "@discordjs/voice": "^0.11.0",
+    "@prisma/client": "^4.10.1",
     "discord-player": "github:mrbartolonio/discord-player#develop",
     "discord.js": "^14.3.0",
     "dotenv": "^16.0.0",
     "ffmpeg-static": "^4.4.1",
-    "mysql": "^2.18.1",
-    "sqlite3": "^5.1.4",
     "ytdl-core": "^4.11.2"
   },
   "devDependencies": {
-    "eslint": "^8.16.0"
+    "eslint": "^8.16.0",
+    "prisma": "^4.10.1"
   }
 }
