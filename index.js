@@ -1,8 +1,13 @@
-const {Client, GatewayIntentBits, Collection} = require('discord.js')
+const {
+  Client,
+  GatewayIntentBits,
+  Collection,
+  ActivityType,
+} = require('discord.js')
 const dotenv = require('dotenv')
 const {Player} = require('discord-player')
 const loaderSlashes = require('./src/utils/loadSlash.js')
-const connection = require('./src/utils/database.js')
+const db = require('./src/utils/database.js')
 const {messListener} = require('./src/modules/message_listener.js')
 const {updater} = require('./src/modules/embedupdater.js')
 const btnHandl = require('./src/modules/buttonsHandler.js')
@@ -35,10 +40,14 @@ client.on('guildCreate', (guild) => {
   loaderSlashes(client, guild.id)
 })
 client.on('ready', () => {
-  client.user.setActivity({
+  /*   client.user.setActivity(`Buja na: ${client.guilds.cache.size} serwerach`, {
+    type: 'LISTENING',
+  }) */
+  updateStatus()
+  /*   client.user.setActivity({
     name: '🎶 | Rozkręcamy tą imprezę!',
     type: 'LISTENING',
-  })
+  }) */
   loaderSlashes(client)
   console.log(`Zalogowany jako: ${client.user.tag}`)
 })
@@ -56,7 +65,7 @@ client.on('interactionCreate', (interaction) => {
     if (!slashcmd) interaction.reply('Błędna komenda')
 
     await interaction.deferReply({ephemeral: true})
-    await slashcmd.run({client, interaction, connection})
+    await slashcmd.run({client, interaction, db})
   }
   handleCommand()
   handleButton()
@@ -65,3 +74,18 @@ updater(client, client.player, client.channels)
 messListener(client)
 
 client.login(TOKEN)
+
+function updateStatus() {
+  client.user.setPresence({
+    activities: [
+      {
+        name: `🎶 | Buja na: ${client.guilds.cache.size} serwerach`,
+        type: ActivityType.Listening,
+      },
+    ],
+    status: 'idle',
+  })
+  console.log('update presence')
+}
+
+module.exports = updateStatus
