@@ -29,6 +29,7 @@ client.slashcommands = new Collection()
 client.distube = new DisTube(client, {
   leaveOnFinish: true,
   leaveOnEmpty: true,
+  emptyCooldown: 10,
   emitNewSongOnly: true,
   emitAddSongWhenCreatingQueue: false,
   emitAddListWhenCreatingQueue: false,

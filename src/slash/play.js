@@ -7,7 +7,7 @@ const {
 } = require('discord.js')
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('music')
+    .setName('djblyat')
     .setDescription(`Komendy do zarządzania djblyatman'em`)
     .addSubcommand((subcommand) =>
       subcommand
@@ -86,15 +86,16 @@ module.exports = {
             textChannel: channel,
             member: member,
           })
-          return interaction.reply({content: 'Dodano piosenkę'})
-          break
+          return interaction.reply({content: 'Przetworzono komendę'})
+
         case 'volume':
           client.distube.setVolume(voiceChannel, volume)
           return interaction.reply({
             content: `Głośność ustawiono na: ${volume}%`,
           })
-          break
+
         case 'opcje':
+          // eslint-disable-next-line no-case-declarations
           const queue = await client.distube.getQueue(voiceChannel)
 
           if (!queue) {
@@ -111,46 +112,45 @@ module.exports = {
                 .setColor('Blue')
                 .setDescription('Piosenka została pominięta')
               return interaction.reply({embeds: [embed], ephemeral: true})
-              break
+
             case 'stop':
               await queue.stop(voiceChannel)
               embed.setColor('Red').setDescription('Kolejka została zatrzymana')
               return interaction.reply({embeds: [embed], ephemeral: true})
-              break
+
             case 'pause':
               await queue.pause(voiceChannel)
               embed
                 .setColor('Orange')
                 .setDescription('Piosenka została wstrzymana')
               return interaction.reply({embeds: [embed], ephemeral: true})
-              break
+
             case 'resume':
               await queue.pause(voiceChannel)
               embed
                 .setColor('Green')
                 .setDescription('Piosenka została wznowiona')
               return interaction.reply({embeds: [embed], ephemeral: true})
-              break
+
             case 'queue':
               embed
                 .setColor('Purple')
                 .setDescription(
                   `${queue.songs.map(
                     (song, id) =>
-                      `\n**${id + 1}.** ${song.name} -\`${
-                        song.formattedDuration
-                      }`,
+                      `\n**${id + 1}.** \`[${song.formattedDuration}]\` [${
+                        song.name
+                      }](${song.url}) -- ${song.user}`,
                   )}`,
                 )
+              //  .setThumbnail(queue.songs[0][Object.keys(queue.songs[0])[8]])
               return interaction.reply({embeds: [embed], ephemeral: true})
-              break
           }
 
           break
       }
     } catch (error) {
-      console.log(error)
-      embed.setColor('Red').setDescription('Coś poszło nie tak')
+      embed.setColor('Red').setDescription(error.message)
       return interaction.reply({embeds: [embed], ephemeral: true})
     }
   },
