@@ -15,7 +15,7 @@ module.exports = {
         .setDescription('Odtwórz piosenkę')
         .addStringOption((option) =>
           option
-            .setName('treść')
+            .setName('tresc')
             .setDescription('Podaj nazwę lub link do piosenki'),
         ),
     )
@@ -54,8 +54,8 @@ module.exports = {
     const {options, member, guild, channel} = interaction
 
     const subcommand = options.getSubcommand()
-    const query = options.getString('query')
-    const volume = options.getNumber('procenty')
+    const query = options.getString('tresc')
+    const volume = options.getInteger('procenty')
     const option = options.getString('opcje')
     const voiceChannel = member.voice.channel
 

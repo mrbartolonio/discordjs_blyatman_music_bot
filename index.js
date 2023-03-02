@@ -26,14 +26,18 @@ const client = new Client({
   ],
 })
 client.slashcommands = new Collection()
-client.distube =
-  (client,
-  {
-    emitNewSongOnly: true,
-    leaveOnFinish: true,
-    emitAddSongWhenCreatingQueue: false,
-    plugins: [new SpotifyPlugin()],
-  })
+client.distube = new DisTube(client, {
+  leaveOnFinish: true,
+  leaveOnEmpty: true,
+  emitNewSongOnly: true,
+  emitAddSongWhenCreatingQueue: false,
+  emitAddListWhenCreatingQueue: false,
+  plugins: [
+    new SpotifyPlugin({
+      emitEventsAfterFetching: true,
+    }),
+  ],
+})
 
 client.on('guildCreate', (guild) => {
   console.log('Joined a new guild: ' + guild.name)
