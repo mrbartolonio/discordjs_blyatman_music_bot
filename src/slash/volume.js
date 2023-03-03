@@ -1,20 +1,22 @@
 const {EmbedBuilder, SlashCommandBuilder} = require('discord.js')
 module.exports = {
   data: new SlashCommandBuilder()
-
-    .setName('play')
-    .setDescription('Odtwórz piosenkę')
-    .addStringOption((option) =>
-      option.setName('name').setDescription('Podaj nazwę lub link do piosenki'),
+    .setName('volume')
+    .setDescription('Ustaw głośność odtwarzania')
+    .addIntegerOption((option) =>
+      option
+        .setName('procenty')
+        .setDescription('50=50%')
+        .setMinValue(1)
+        .setMaxValue(100)
+        .setRequired(true),
     ),
 
   run: async ({client, interaction}) => {
-    const {options, member, guild, channel} = interaction
+    const {options, member, guild} = interaction
 
-    const query = options.getString('name')
-
+    const volume = options.getInteger('procenty')
     const voiceChannel = member.voice.channel
-
     const embed = new EmbedBuilder()
 
     if (!voiceChannel) {
@@ -36,11 +38,10 @@ module.exports = {
     }
 
     try {
-      client.distube.play(voiceChannel, query, {
-        textChannel: channel,
-        member: member,
+      await client.distube.setVolume(voiceChannel, volume)
+      return interaction.reply({
+        content: `🔊 Głośność ustawiono na: ${volume}%`,
       })
-      return interaction.reply({content: 'Przetwarzanie...🤔'})
     } catch (error) {
       console.log(error)
       embed.setColor('Red').setDescription(error.message)

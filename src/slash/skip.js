@@ -1,20 +1,11 @@
 const {EmbedBuilder, SlashCommandBuilder} = require('discord.js')
 module.exports = {
-  data: new SlashCommandBuilder()
-
-    .setName('play')
-    .setDescription('Odtwórz piosenkę')
-    .addStringOption((option) =>
-      option.setName('name').setDescription('Podaj nazwę lub link do piosenki'),
-    ),
+  data: new SlashCommandBuilder().setName('skip').setDescription('Pomiń utwór'),
 
   run: async ({client, interaction}) => {
-    const {options, member, guild, channel} = interaction
-
-    const query = options.getString('name')
+    const {member, guild} = interaction
 
     const voiceChannel = member.voice.channel
-
     const embed = new EmbedBuilder()
 
     if (!voiceChannel) {
@@ -36,11 +27,10 @@ module.exports = {
     }
 
     try {
-      client.distube.play(voiceChannel, query, {
-        textChannel: channel,
-        member: member,
-      })
-      return interaction.reply({content: 'Przetwarzanie...🤔'})
+      const queue = await client.distube.getQueue(voiceChannel)
+      await queue.skip(voiceChannel)
+      embed.setColor('Blue').setDescription('Piosenka została pominięta')
+      return interaction.reply({embeds: [embed], ephemeral: true})
     } catch (error) {
       console.log(error)
       embed.setColor('Red').setDescription(error.message)

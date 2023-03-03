@@ -3,13 +3,10 @@ const {
   GatewayIntentBits,
   Collection,
   ActivityType,
-  REST,
-  Routes,
 } = require('discord.js')
-const fs = require('node:fs')
-const path = require('node:path')
+
 const dotenv = require('dotenv')
-const db = require('./src/utils/database.js')
+//const db = require('./src/utils/database.js')
 const loaderSlashes = require('./src/utils/loadSlash.js')
 const {DisTube} = require('distube')
 const {SpotifyPlugin} = require('@distube/spotify')
