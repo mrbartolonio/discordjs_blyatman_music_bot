@@ -1,8 +1,9 @@
+/* eslint-disable no-case-declarations */
 const {EmbedBuilder, SlashCommandBuilder} = require('discord.js')
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('wznów')
-    .setDescription('Wznów odtwarzanie'),
+    .setName('odtwarzane')
+    .setDescription('Wyświetla informacje o aktualnie odtwarzanej piosence'),
 
   run: async ({client, interaction}) => {
     const {member, guild} = interaction
@@ -34,8 +35,13 @@ module.exports = {
       return interaction.reply({embeds: [embed], ephemeral: true})
     }
     try {
-      await queue.resume(voiceChannel)
-      embed.setColor('Green').setDescription('Piosenka została wznowiona')
+      const song = queue.songs[0]
+      embed
+        .setColor('blue')
+        .setDescription(
+          `**W tym momencie odtwarzane:** \`[${song.formattedDuration}]\` [${song.name}](${song.url}) - ${song.user}`,
+        )
+        .setThumbnail(song.thumbnail)
       return interaction.reply({embeds: [embed], ephemeral: true})
     } catch (error) {
       console.log(error)

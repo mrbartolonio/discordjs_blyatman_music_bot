@@ -1,12 +1,24 @@
+/* eslint-disable no-case-declarations */
 const {EmbedBuilder, SlashCommandBuilder} = require('discord.js')
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('wznów')
-    .setDescription('Wznów odtwarzanie'),
+    .setName('petla')
+    .setDescription('Wyświetla typy pętli')
+    .addStringOption((option) =>
+      option
+        .setName('typ')
+        .setDescription('Dostępne typy pętli: OFF | Piosenka | Kolejka')
+        .addChoices(
+          {name: 'off', value: 'off'},
+          {name: 'piosenka', value: 'song'},
+          {name: 'kolejka', value: 'queue'},
+        )
+        .setRequired(true),
+    ),
 
   run: async ({client, interaction}) => {
-    const {member, guild} = interaction
-
+    const {options, member, guild} = interaction
+    const option = options.getString('typ')
     const voiceChannel = member.voice.channel
     const embed = new EmbedBuilder()
 
@@ -34,8 +46,28 @@ module.exports = {
       return interaction.reply({embeds: [embed], ephemeral: true})
     }
     try {
-      await queue.resume(voiceChannel)
-      embed.setColor('Green').setDescription('Piosenka została wznowiona')
+      let mode = null
+      switch (option) {
+        case 'off':
+          mode = 0
+          break
+
+        case 'song':
+          mode = 1
+          break
+
+        case 'queue':
+          mode = 2
+          break
+      }
+
+      mode = await queue.setRepeatMode(mode)
+      mode = mode
+        ? mode === 2
+          ? 'Powtarzanie kolejki'
+          : 'Powtarzanie piosenki'
+        : 'OFF'
+      embed.setColor('Orange').setDescription(`Ustawion tryb pętli na: ${mode}`)
       return interaction.reply({embeds: [embed], ephemeral: true})
     } catch (error) {
       console.log(error)

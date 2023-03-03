@@ -1,8 +1,9 @@
+/* eslint-disable no-case-declarations */
 const {EmbedBuilder, SlashCommandBuilder} = require('discord.js')
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('wznów')
-    .setDescription('Wznów odtwarzanie'),
+    .setName('mix')
+    .setDescription('Mixuje kolejność utworów w kolejce'),
 
   run: async ({client, interaction}) => {
     const {member, guild} = interaction
@@ -34,8 +35,9 @@ module.exports = {
       return interaction.reply({embeds: [embed], ephemeral: true})
     }
     try {
-      await queue.resume(voiceChannel)
-      embed.setColor('Green').setDescription('Piosenka została wznowiona')
+      await queue.shuffle()
+      embed.setColor('Purple').setDescription(`Kolejka została zmixowana`)
+
       return interaction.reply({embeds: [embed], ephemeral: true})
     } catch (error) {
       console.log(error)

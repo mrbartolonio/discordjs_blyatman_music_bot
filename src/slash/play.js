@@ -5,7 +5,10 @@ module.exports = {
     .setName('play')
     .setDescription('Odtwórz piosenkę')
     .addStringOption((option) =>
-      option.setName('name').setDescription('Podaj nazwę lub link do piosenki'),
+      option
+        .setName('name')
+        .setDescription('Podaj nazwę lub link do piosenki')
+        .setRequired(true),
     ),
 
   run: async ({client, interaction}) => {

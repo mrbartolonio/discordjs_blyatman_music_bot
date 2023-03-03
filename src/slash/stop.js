@@ -27,9 +27,14 @@ module.exports = {
         )
       return interaction.reply({embeds: [embed], ephemeral: true})
     }
+    const queue = await client.distube.getQueue(voiceChannel)
+
+    if (!queue) {
+      embed.setColor('Red').setDescription(`Brak aktywnej kolejki odtwarzania`)
+      return interaction.reply({embeds: [embed], ephemeral: true})
+    }
 
     try {
-      const queue = await client.distube.getQueue(voiceChannel)
       await queue.stop(voiceChannel)
       embed.setColor('Red').setDescription('Kolejka została zatrzymana')
       return interaction.reply({embeds: [embed], ephemeral: true})
