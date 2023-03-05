@@ -8,8 +8,8 @@ const {
 const dotenv = require('dotenv')
 //const db = require('./src/utils/database.js')
 const loaderSlashes = require('./src/utils/loadSlash.js')
-const {DisTube} = require('distube')
-const {SpotifyPlugin} = require('@distube/spotify')
+const {registerPlayerEvents} = require('./src/utils/events.js')
+const {Player} = require('discord-player')
 
 dotenv.config()
 const TOKEN = process.env.TOKEN
@@ -23,19 +23,17 @@ const client = new Client({
   ],
 })
 client.slashcommands = new Collection()
-client.distube = new DisTube(client, {
-  leaveOnFinish: true,
-  leaveOnEmpty: true,
-  emptyCooldown: 10,
-  emitNewSongOnly: true,
-  emitAddSongWhenCreatingQueue: false,
-  emitAddListWhenCreatingQueue: false,
-  plugins: [
-    new SpotifyPlugin({
-      emitEventsAfterFetching: true,
-    }),
-  ],
+client.player = new Player(client, {
+  ytdlOptions: {
+    requestOptions: {
+      headers: {
+        cookie: process.env.COOKIE_YT,
+      },
+    },
+  },
 })
+
+registerPlayerEvents(client.player)
 
 client.on('guildCreate', (guild) => {
   console.log('Joined a new guild: ' + guild.name)
@@ -56,9 +54,21 @@ client.on('interactionCreate', (interaction) => {
     if (!slashcmd) interaction.reply('Błędna komenda')
 
     //  await interaction.deferReply({ephemeral: true})
-    await slashcmd.run({client, interaction})
+    await slashcmd.execute({client, interaction})
   }
+
+  async function handleAutocomplete() {
+    if (!interaction.isAutocomplete()) return
+
+    const slashcmd = client.slashcommands.get(interaction.commandName)
+    if (!slashcmd) interaction.reply('Błędna komenda')
+
+    //  await interaction.deferReply({ephemeral: true})
+    await slashcmd.autocomplete({client, interaction})
+  }
+
   handleCommand()
+  handleAutocomplete()
 })
 
 client.login(TOKEN)
