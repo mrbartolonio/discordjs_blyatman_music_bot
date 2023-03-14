@@ -81,7 +81,6 @@ function updateStatus() {
         type: ActivityType.Listening,
       },
     ],
-    status: 'idle',
   })
   console.log('update presence')
 }

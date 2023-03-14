@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 const {
   EmbedBuilder,
   SlashCommandBuilder,
@@ -49,8 +50,8 @@ module.exports = {
         requestedBy: interaction.user,
         searchEngine: QueryType.AUTO,
       })
-      .catch(() => {
-        console.log('he')
+      .catch((e) => {
+        console.log(e)
       })
 
     if (!searchResult || !searchResult.tracks.length)
@@ -71,7 +72,7 @@ module.exports = {
     })
 
     try {
-      //  if (!queue.connection) await queue.connect(member.voice.channel)
+      if (!queue.connection) await queue.connect(voiceChannel)
     } catch (error) {
       console.log(error)
       // if (!queue.deleted) queue.delete()
@@ -85,7 +86,6 @@ module.exports = {
         searchResult.playlist ? 'playlist' : 'track'
       }...`,
     })
-    if (!queue.connection) await queue.connect(voiceChannel)
 
     searchResult.playlist
       ? queue.addTrack(searchResult.tracks)
@@ -97,13 +97,15 @@ module.exports = {
           .setColor('blue')
           .setDescription(
             searchResult.playlist
-              ? `Dodano [${searchResult._data.playlist.title}](${searchResult._data.playlist.url}) do odtwarzania | ${searchResult._data.playlist.tracks.length} utwórów`
-              : `Dodano [${searchResult._data.tracks[0].author} - ${searchResult._data.tracks[0].title}](${searchResult._data.tracks[0].url}) [${searchResult._data.tracks[0].duration}]do odtwarzania`,
+              ? `Dodano [${searchResult._data.playlist.title} - ${searchResult._data.playlist.author.name}](${searchResult._data.playlist.url}) do odtwarzania | ${searchResult._data.playlist.tracks.length} utwórów`
+              : `Dodano [${searchResult._data.tracks[0].author} - ${searchResult._data.tracks[0].title}](${searchResult._data.tracks[0].url}) [${searchResult._data.tracks[0].duration}] do odtwarzania`,
           )
           //yt zwraca thumbnail w innym obiekcie, dopasowac miedzy spotify a yt
           .setThumbnail(
             searchResult.playlist
-              ? searchResult._data.playlist.thumbnail
+              ? searchResult._data.playlist.thumbnail.url
+                ? searchResult._data.playlist.thumbnail.url
+                : searchResult._data.playlist.thumbnail
               : searchResult._data.tracks[0].thumbnail,
           )
         await interaction.editReply({embeds: [embed], content: ''})
@@ -117,7 +119,8 @@ module.exports = {
         }, 7000)
       } catch (error) {
         console.log(error)
-        await interaction.editReply({content: error.message})
+        embed.setColor('Red').setDescription(error.message).setTitle('Error')
+        await interaction.editReply({embeds: [embed], content: ''})
       }
     }
   },
