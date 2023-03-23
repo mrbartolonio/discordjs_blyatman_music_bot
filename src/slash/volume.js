@@ -6,12 +6,20 @@ const {
 } = require('discord.js')
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('stop')
-    .setDescription('Zatrzymuje kolejkę')
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+    .setName('volume')
+    .setDescription('Ustawia głośność odtwarzania')
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addIntegerOption((option) =>
+      option
+        .setName('vol')
+        .setDescription('Wartość od 0 do 100. Wartość traktowana jako procenty')
+        .setRequired(true),
+    ),
 
   async execute({client, interaction}) {
-    const {member, guild} = interaction
+    const {options, member, guild} = interaction
+
+    const query = options.getInteger('vol')
 
     const queue = client.player.nodes.get(guild)
 
@@ -38,21 +46,12 @@ module.exports = {
       return interaction.reply({embeds: [embed], ephemeral: true})
     }
 
-    try {
-      if (!queue.connection) await queue.connect(voiceChannel)
-    } catch (error) {
-      console.log(error)
-      // if (!queue.deleted) queue.delete()
-      return void interaction.followUp({
-        content: 'Could not join your voice channel!',
-      })
-    }
-
     if (queue.node.isPlaying()) {
       try {
-        await queue.tracks.clear()
-        await queue.delete()
-        embed.setColor('Orange').setDescription(`Zatrzymano kolejkę`)
+        await queue.node.setVolume(query)
+        embed
+          .setColor('Orange')
+          .setDescription(`Ustawiono głośność na ${query}%`)
 
         await interaction.editReply({embeds: [embed], content: ''})
 
