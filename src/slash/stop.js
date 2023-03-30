@@ -48,7 +48,7 @@ module.exports = {
       })
     }
 
-    if (queue.node.isPlaying()) {
+    if (queue?.currentTrack) {
       try {
         await queue.tracks.clear()
         await queue.delete()

@@ -6,20 +6,12 @@ const {
 } = require('discord.js')
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('volume')
-    .setDescription('Ustawia głośność odtwarzania')
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addIntegerOption((option) =>
-      option
-        .setName('vol')
-        .setDescription('Wartość od 0 do 100. Wartość traktowana jako procenty')
-        .setRequired(true),
-    ),
+    .setName('skip')
+    .setDescription('Pomija bieżący utwór')
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   async execute({client, interaction}) {
-    const {options, member, guild} = interaction
-
-    const query = options.getInteger('vol')
+    const {member, guild} = interaction
 
     const queue = client.player.nodes.get(guild)
 
@@ -46,12 +38,16 @@ module.exports = {
       return interaction.reply({embeds: [embed], ephemeral: true})
     }
 
-    if (queue?.currentTrack) {
+    if (queue.node.isPlaying()) {
       try {
-        await queue.node.setVolume(query)
+        queue.node.skip()
+
         embed
           .setColor('Orange')
-          .setDescription(`Ustawiono głośność na ${query}%`)
+          .setDescription(
+            `Pominięto [${queue.currentTrack.title} - ${queue.currentTrack.author}](${queue.currentTrack.url})`,
+          )
+          .setThumbnail(`${queue.currentTrack.thumbnail}`)
 
         await interaction.editReply({embeds: [embed], content: ''})
 

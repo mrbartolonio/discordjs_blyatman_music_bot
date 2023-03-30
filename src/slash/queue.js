@@ -1,4 +1,5 @@
 /* eslint-disable no-useless-escape */
+const moment = require('moment')
 const {
   EmbedBuilder,
   SlashCommandBuilder,
@@ -6,20 +7,12 @@ const {
 } = require('discord.js')
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('volume')
-    .setDescription('Ustawia głośność odtwarzania')
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addIntegerOption((option) =>
-      option
-        .setName('vol')
-        .setDescription('Wartość od 0 do 100. Wartość traktowana jako procenty')
-        .setRequired(true),
-    ),
+    .setName('queue')
+    .setDescription('Wyświetla aktualną kolejkę odtwarzania')
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   async execute({client, interaction}) {
-    const {options, member, guild} = interaction
-
-    const query = options.getInteger('vol')
+    const {member, guild} = interaction
 
     const queue = client.player.nodes.get(guild)
 
@@ -48,10 +41,42 @@ module.exports = {
 
     if (queue?.currentTrack) {
       try {
-        await queue.node.setVolume(query)
+        const tracks = queue.tracks.toArray()
+
         embed
-          .setColor('Orange')
-          .setDescription(`Ustawiono głośność na ${query}%`)
+          .setColor('Purple')
+          .setDescription(
+            `\n**Teraz grane:** \n \`[${queue.currentTrack.duration}]\` [${
+              queue.currentTrack.title
+            } - ${queue.currentTrack.author}](${queue.currentTrack.url}) - ${
+              queue.currentTrack.requestedBy
+            } \n ${tracks
+              .slice(0, 15)
+              .map(
+                (song, id) =>
+                  `\n**${id + 1}.** \`[${song.duration}]\` [${song.title} - ${
+                    song.author
+                  }](${song.url}) - ${song.requestedBy}`,
+              )
+              .join('')}`,
+          )
+          .setFooter({
+            text: `${
+              Object.keys(tracks).length - 15 > 0
+                ? `Dodatkowo ${
+                    Object.keys(tracks).length - 15
+                  } piosenek w kolejce | Czas trwania całej kolejki: [${moment(
+                    tracks
+                      .reduce(
+                        (acc, t) => acc.add(moment.duration(t.duration)),
+                        moment.duration(),
+                      )
+                      .as('milliseconds'),
+                  ).format('HH:mm:ss')}]`
+                : 'Brak dodatkowych piosenek w kolejce'
+            }`,
+          })
+          .setThumbnail(`${queue.currentTrack.thumbnail}`)
 
         await interaction.editReply({embeds: [embed], content: ''})
 
@@ -61,7 +86,7 @@ module.exports = {
           } catch (error) {
             console.log(error)
           }
-        }, 7000)
+        }, 20000)
       } catch (error) {
         console.log(error)
         embed.setColor('Red').setDescription(error.message).setTitle('Error')
@@ -81,4 +106,10 @@ module.exports = {
       }, 7000)
     }
   },
+}
+
+function msToMinAndSec(millis) {
+  var minutes = Math.floor(millis / 60000)
+  var seconds = ((millis % 60000) / 1000).toFixed(0)
+  return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
 }

@@ -66,9 +66,9 @@ module.exports = {
       selfDeaf: true,
       volume: 50,
       leaveOnEmpty: true,
-      leaveOnEmptyCooldown: 300000,
+      leaveOnEmptyCooldown: 3000,
       leaveOnEnd: true,
-      leaveOnEndCooldown: 300000,
+      leaveOnEndCooldown: 3000,
     })
 
     try {

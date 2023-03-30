@@ -6,20 +6,12 @@ const {
 } = require('discord.js')
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('volume')
-    .setDescription('Ustawia głośność odtwarzania')
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addIntegerOption((option) =>
-      option
-        .setName('vol')
-        .setDescription('Wartość od 0 do 100. Wartość traktowana jako procenty')
-        .setRequired(true),
-    ),
+    .setName('shuffle')
+    .setDescription('Miesza kolejkę')
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   async execute({client, interaction}) {
-    const {options, member, guild} = interaction
-
-    const query = options.getInteger('vol')
+    const {member, guild} = interaction
 
     const queue = client.player.nodes.get(guild)
 
@@ -48,10 +40,8 @@ module.exports = {
 
     if (queue?.currentTrack) {
       try {
-        await queue.node.setVolume(query)
-        embed
-          .setColor('Orange')
-          .setDescription(`Ustawiono głośność na ${query}%`)
+        queue.tracks.shuffle()
+        embed.setColor('Orange').setDescription(`Wymieszano kolejkę`)
 
         await interaction.editReply({embeds: [embed], content: ''})
 
