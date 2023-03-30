@@ -42,7 +42,11 @@ module.exports = {
     if (queue?.currentTrack) {
       try {
         const tracks = queue.tracks.toArray()
-
+        console.log(
+          queue.currentTrack.playlist.thumbnail || queue.currentTrack.thumbnail,
+        )
+        console.log(queue.currentTrack.playlist.thumbnail)
+        console.log(queue.currentTrack.thumbnail)
         embed
           .setColor('Purple')
           .setDescription(
@@ -76,7 +80,20 @@ module.exports = {
                 : 'Brak dodatkowych piosenek w kolejce'
             }`,
           })
-          .setThumbnail(`${queue.currentTrack.thumbnail}`)
+          .setThumbnail(
+            `${
+              queue.currentTrack.playlist.thumbnail
+                ? queue.currentTrack.playlist.thumbnail.endsWith(
+                    '.png',
+                    '.jpg',
+                    '.jpeg',
+                    '.webp',
+                  )
+                  ? queue.currentTrack.playlist.thumbnail
+                  : `${queue.currentTrack.playlist.thumbnail}.png `
+                : queue.currentTrack.thumbnail
+            }`,
+          )
 
         await interaction.editReply({embeds: [embed], content: ''})
 

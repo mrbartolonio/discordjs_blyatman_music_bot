@@ -105,7 +105,14 @@ module.exports = {
             searchResult.playlist
               ? searchResult._data.playlist.thumbnail.url
                 ? searchResult._data.playlist.thumbnail.url
-                : searchResult._data.playlist.thumbnail
+                : searchResult._data.playlist.thumbnail.endsWith(
+                    '.png',
+                    '.jpg',
+                    '.jpeg',
+                    '.webp',
+                  )
+                ? searchResult._data.playlist.thumbnail
+                : `${searchResult._data.playlist.thumbnail}.png `
               : searchResult._data.tracks[0].thumbnail,
           )
         await interaction.editReply({embeds: [embed], content: ''})
