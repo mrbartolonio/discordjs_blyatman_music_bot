@@ -5,6 +5,8 @@ const {
   SlashCommandBuilder,
   PermissionFlagsBits,
 } = require('discord.js')
+//const {Playlist} = require('discord-player')
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('filters')
@@ -70,6 +72,7 @@ module.exports = {
 
       try {
         if (filter === 'Off') {
+          console.log(queue)
           await queue.filters.ffmpeg.setFilters(false)
           embed
             .setColor('Purple')

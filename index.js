@@ -4,7 +4,7 @@ const {
   Collection,
   ActivityType,
 } = require('discord.js')
-
+const db = require('./src/utils/database')
 const dotenv = require('dotenv')
 //const db = require('./src/utils/database.js')
 const loaderSlashes = require('./src/utils/loadSlash.js')

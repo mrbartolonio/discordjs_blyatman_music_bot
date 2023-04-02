@@ -28,6 +28,7 @@
     "mysql": "^2.18.1",
     "opusscript": "^0.0.8",
     "play-dl": "^1.9.6",
+    "sqlite3": "^5.1.6",
     "ytdl-core": "^4.11.3"
   },
   "devDependencies": {

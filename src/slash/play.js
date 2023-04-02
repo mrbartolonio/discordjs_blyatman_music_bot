@@ -57,77 +57,129 @@ module.exports = {
     if (!searchResult || !searchResult.tracks.length)
       return void interaction.followUp({content: 'No results were found!'})
 
-    const queue = client.player.nodes.create(guild, {
-      metadata: {
-        channel: interaction.channel,
-        client: interaction.guild.members.me,
-        requestedBy: interaction.user,
-      },
-      selfDeaf: true,
-      volume: 50,
-      leaveOnEmpty: true,
-      leaveOnEmptyCooldown: 3000,
-      leaveOnEnd: true,
-      leaveOnEndCooldown: 3000,
-    })
-
-    try {
-      if (!queue.connection) await queue.connect(voiceChannel)
-    } catch (error) {
-      console.log(error)
-      // if (!queue.deleted) queue.delete()
-      return void interaction.followUp({
-        content: 'Could not join your voice channel!',
+    let queue = client.player.nodes.get(guild)
+    if (queue?.currentTrack) {
+      await interaction.followUp({
+        content: `⏱ | Ładowanie  ${
+          searchResult.playlist ? 'Playlisty' : 'Piosenki'
+        }...`,
       })
-    }
 
-    await interaction.followUp({
-      content: `⏱ | Loading your ${
-        searchResult.playlist ? 'playlist' : 'track'
-      }...`,
-    })
-
-    searchResult.playlist
-      ? queue.addTrack(searchResult.tracks)
-      : queue.addTrack(searchResult.tracks[0])
-    if (!queue.playing) {
-      try {
-        await queue.node.play()
-        embed
-          .setColor('blue')
-          .setDescription(
-            searchResult.playlist
-              ? `Dodano [${searchResult._data.playlist.title} - ${searchResult._data.playlist.author.name}](${searchResult._data.playlist.url}) do odtwarzania | ${searchResult._data.playlist.tracks.length} utwórów`
-              : `Dodano [${searchResult._data.tracks[0].author} - ${searchResult._data.tracks[0].title}](${searchResult._data.tracks[0].url}) [${searchResult._data.tracks[0].duration}] do odtwarzania`,
-          )
-          //yt zwraca thumbnail w innym obiekcie, dopasowac miedzy spotify a yt
-          .setThumbnail(
-            searchResult.playlist
-              ? searchResult._data.playlist.thumbnail.url
+      if (!queue.playing) {
+        try {
+          searchResult.playlist
+            ? queue.addTrack(searchResult.tracks)
+            : queue.addTrack(searchResult.tracks[0])
+          embed
+            .setColor('blue')
+            .setDescription(
+              searchResult.playlist
+                ? `Dodano [${searchResult._data.playlist.title} - ${searchResult._data.playlist.author.name}](${searchResult._data.playlist.url}) do odtwarzania | ${searchResult._data.playlist.tracks.length} utwórów`
+                : `Dodano [${searchResult._data.tracks[0].author} - ${searchResult._data.tracks[0].title}](${searchResult._data.tracks[0].url}) [${searchResult._data.tracks[0].duration}] do odtwarzania`,
+            )
+            //yt zwraca thumbnail w innym obiekcie, dopasowac miedzy spotify a yt
+            .setThumbnail(
+              searchResult.playlist
                 ? searchResult._data.playlist.thumbnail.url
-                : searchResult._data.playlist.thumbnail.endsWith(
-                    '.png',
-                    '.jpg',
-                    '.jpeg',
-                    '.webp',
-                  )
-                ? searchResult._data.playlist.thumbnail
-                : `${searchResult._data.playlist.thumbnail}.png `
-              : searchResult._data.tracks[0].thumbnail,
-          )
-        await interaction.editReply({embeds: [embed], content: ''})
+                  ? searchResult._data.playlist.thumbnail.url
+                  : searchResult._data.playlist.thumbnail.endsWith(
+                      '.png',
+                      '.jpg',
+                      '.jpeg',
+                      '.webp',
+                    )
+                  ? searchResult._data.playlist.thumbnail
+                  : `${searchResult._data.playlist.thumbnail}.png `
+                : searchResult._data.tracks[0].thumbnail,
+            )
+          await interaction.editReply({embeds: [embed], content: ''})
 
-        setTimeout(() => {
-          try {
-            interaction.deleteReply()
-          } catch (error) {
-            console.log(error)
-          }
-        }, 7000)
+          setTimeout(() => {
+            try {
+              interaction.deleteReply()
+            } catch (error) {
+              console.log(error)
+            }
+          }, 7000)
+        } catch (error) {
+          console.log(error)
+          embed.setColor('Red').setDescription(error.message).setTitle('Error')
+          await interaction.editReply({embeds: [embed], content: ''})
+        }
+      }
+    } else {
+      const queue = client.player.nodes.create(guild, {
+        metadata: {
+          channel: interaction.channel,
+          client: interaction.guild.members.me,
+          requestedBy: interaction.user,
+        },
+        selfDeaf: true,
+        volume: 50,
+        leaveOnEmpty: true,
+        leaveOnEmptyCooldown: 3000,
+        leaveOnEnd: true,
+        leaveOnEndCooldown: 3000,
+      })
+
+      try {
+        if (!queue.connection) await queue.connect(voiceChannel)
       } catch (error) {
         console.log(error)
-        embed.setColor('Red').setDescription(error.message).setTitle('Error')
-        await interaction.editReply({embeds: [embed], content: ''})
+        // if (!queue.deleted) queue.delete()
+        return void interaction.followUp({
+          content: 'Nie mogę dołączyć na twój kanał!',
+        })
+      }
+
+      await interaction.followUp({
+        content: `⏱ | Ładowanie  ${
+          searchResult.playlist ? 'Playlisty' : 'Piosenki'
+        }...`,
+      })
+
+      searchResult.playlist
+        ? queue.addTrack(searchResult.tracks)
+        : queue.addTrack(searchResult.tracks[0])
+      if (!queue.playing) {
+        try {
+          await queue.node.play()
+          embed
+            .setColor('blue')
+            .setDescription(
+              searchResult.playlist
+                ? `Dodano [${searchResult._data.playlist.title} - ${searchResult._data.playlist.author.name}](${searchResult._data.playlist.url}) do odtwarzania | ${searchResult._data.playlist.tracks.length} utwórów`
+                : `Dodano [${searchResult._data.tracks[0].author} - ${searchResult._data.tracks[0].title}](${searchResult._data.tracks[0].url}) [${searchResult._data.tracks[0].duration}] do odtwarzania`,
+            )
+            //yt zwraca thumbnail w innym obiekcie, dopasowac miedzy spotify a yt
+            .setThumbnail(
+              searchResult.playlist
+                ? searchResult._data.playlist.thumbnail.url
+                  ? searchResult._data.playlist.thumbnail.url
+                  : searchResult._data.playlist.thumbnail.endsWith(
+                      '.png',
+                      '.jpg',
+                      '.jpeg',
+                      '.webp',
+                    )
+                  ? searchResult._data.playlist.thumbnail
+                  : `${searchResult._data.playlist.thumbnail}.png `
+                : searchResult._data.tracks[0].thumbnail,
+            )
+          await interaction.editReply({embeds: [embed], content: ''})
+
+          setTimeout(() => {
+            try {
+              interaction.deleteReply()
+            } catch (error) {
+              console.log(error)
+            }
+          }, 7000)
+        } catch (error) {
+          console.log(error)
+          embed.setColor('Red').setDescription(error.message).setTitle('Error')
+          await interaction.editReply({embeds: [embed], content: ''})
+        }
       }
     }
   },

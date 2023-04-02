@@ -42,25 +42,29 @@ module.exports = {
     if (queue?.currentTrack) {
       try {
         const tracks = queue.tracks.toArray()
-        console.log(
-          queue.currentTrack.playlist.thumbnail || queue.currentTrack.thumbnail,
-        )
-        console.log(queue.currentTrack.playlist.thumbnail)
-        console.log(queue.currentTrack.thumbnail)
+        console.log(tracks)
         embed
           .setColor('Purple')
           .setDescription(
             `\n**Teraz grane:** \n \`[${queue.currentTrack.duration}]\` [${
               queue.currentTrack.title
             } - ${queue.currentTrack.author}](${queue.currentTrack.url}) - ${
-              queue.currentTrack.requestedBy
+              typeof queue.currentTrack.requestedBy === 'object' &&
+              queue.currentTrack.requestedBy !== null
+                ? queue.currentTrack.requestedBy
+                : `<@${queue.currentTrack.requestedBy}>`
             } \n ${tracks
               .slice(0, 15)
               .map(
                 (song, id) =>
                   `\n**${id + 1}.** \`[${song.duration}]\` [${song.title} - ${
                     song.author
-                  }](${song.url}) - ${song.requestedBy}`,
+                  }](${song.url}) - ${
+                    typeof song.requestedBy === 'object' &&
+                    song.requestedBy !== null
+                      ? song.requestedBy
+                      : `<@${song.requestedBy}>`
+                  }`,
               )
               .join('')}`,
           )
@@ -80,20 +84,6 @@ module.exports = {
                 : 'Brak dodatkowych piosenek w kolejce'
             }`,
           })
-          .setThumbnail(
-            `${
-              queue.currentTrack.playlist.thumbnail
-                ? queue.currentTrack.playlist.thumbnail.endsWith(
-                    '.png',
-                    '.jpg',
-                    '.jpeg',
-                    '.webp',
-                  )
-                  ? queue.currentTrack.playlist.thumbnail
-                  : `${queue.currentTrack.playlist.thumbnail}.png `
-                : queue.currentTrack.thumbnail
-            }`,
-          )
 
         await interaction.editReply({embeds: [embed], content: ''})
 
