@@ -72,43 +72,60 @@ module.exports = {
 
       try {
         if (filter === 'Off') {
-          console.log(queue)
-          await queue.filters.ffmpeg.setFilters(false)
+          if (queue.filters.ffmpeg.getFiltersEnabled().length >= 1) {
+            await queue.filters.ffmpeg.setFilters(false)
+
+            embed
+              .setColor('Purple')
+              .setDescription(`Wszystkie filtry zostały **Wyłączone**`)
+            await interaction.editReply({embeds: [embed], content: ''})
+
+            setTimeout(() => {
+              try {
+                return interaction.deleteReply()
+              } catch (error) {
+                console.log(error)
+              }
+            }, 5000)
+          } else {
+            embed
+              .setColor('Purple')
+              .setDescription(`Brak filtrów do wyłączenia`)
+            await interaction.editReply({embeds: [embed], content: ''})
+
+            setTimeout(() => {
+              try {
+                return interaction.deleteReply()
+              } catch (error) {
+                console.log(error)
+              }
+            }, 5000)
+          }
+        } else {
+          // if the filter is bassboost, then enable audio normalizer to avoid distortion
+          await queue.filters.ffmpeg.toggle(
+            filter.includes('bassboost') ? ['bassboost', 'normalizer'] : filter,
+          )
+
           embed
             .setColor('Purple')
-            .setDescription(`Wszystkie filtry zostały **Wyłączone**`)
+            .setDescription(
+              ` **${filter}** został **${
+                queue.filters.ffmpeg.isEnabled(filter)
+                  ? 'włączony'
+                  : 'wyłączony'
+              }**`,
+            )
           await interaction.editReply({embeds: [embed], content: ''})
 
           setTimeout(() => {
             try {
-              return interaction.deleteReply()
+              interaction.deleteReply()
             } catch (error) {
               console.log(error)
             }
           }, 5000)
         }
-
-        // if the filter is bassboost, then enable audio normalizer to avoid distortion
-        await queue.filters.ffmpeg.toggle(
-          filter.includes('bassboost') ? ['bassboost', 'normalizer'] : filter,
-        )
-
-        embed
-          .setColor('Purple')
-          .setDescription(
-            ` **${filter}** został **${
-              queue.filters.ffmpeg.isEnabled(filter) ? 'włączony' : 'wyłączony'
-            }**`,
-          )
-        await interaction.editReply({embeds: [embed], content: ''})
-
-        setTimeout(() => {
-          try {
-            interaction.deleteReply()
-          } catch (error) {
-            console.log(error)
-          }
-        }, 5000)
       } catch (error) {
         console.log(error)
         embed.setColor('Red').setDescription(error.message).setTitle('Error')

@@ -49,7 +49,6 @@ module.exports = {
     if (queue?.currentTrack) {
       try {
         await queue.node.setVolume(query)
-        console.log(queue.options.volume)
         embed
           .setColor('Orange')
           .setDescription(`Ustawiono głośność na ${query}%`)

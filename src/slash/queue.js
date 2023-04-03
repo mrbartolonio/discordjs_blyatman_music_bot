@@ -42,7 +42,7 @@ module.exports = {
     if (queue?.currentTrack) {
       try {
         const tracks = queue.tracks.toArray()
-        console.log(tracks)
+        console.log(queue)
         embed
           .setColor('Purple')
           .setDescription(
@@ -68,6 +68,24 @@ module.exports = {
               )
               .join('')}`,
           )
+          .addFields(
+            {name: 'Głośność', value: `${queue.options.volume}%`},
+            {name: '\u200B', value: '\u200B'},
+            {
+              name: `Tryb`,
+              value: `${queue.repeatMode}`,
+            },
+            {
+              name: 'Status',
+              value: `${queue.node.isPlaying() ? 'Odtwarzanie' : 'Pauza'}`,
+            },
+          )
+          .addFields({
+            name: 'Inline field title',
+            value: 'Some value here',
+            inline: true,
+          })
+          .setTimestamp()
           .setFooter({
             text: `${
               Object.keys(tracks).length - 15 > 0
