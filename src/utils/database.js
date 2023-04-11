@@ -18,7 +18,7 @@ db.run(
 )
 
 db.run(
-  'CREATE TABLE IF NOT EXISTS playlists(id INTEGER PRIMARY KEY AUTOINCREMENT,user VARCHAR(40) ,playlist TEXT)',
+  'CREATE TABLE IF NOT EXISTS playlists(id INTEGER PRIMARY KEY AUTOINCREMENT,user VARCHAR(40) ,playlist TEXT,name VARCHAR(40))',
   (err) => {
     if (err) return console.log(err)
   },

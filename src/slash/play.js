@@ -54,6 +54,7 @@ module.exports = {
         console.log(e)
       })
 
+    console.log(searchResult.tracks[0])
     if (!searchResult || !searchResult.tracks.length)
       return void interaction.followUp({content: 'No results were found!'})
 
@@ -64,7 +65,6 @@ module.exports = {
           searchResult.playlist ? 'Playlisty' : 'Piosenki'
         }...`,
       })
-
       if (!queue.playing) {
         try {
           searchResult.playlist
