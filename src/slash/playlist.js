@@ -12,7 +12,15 @@ module.exports = {
     .setDescription('testowa kolejka')
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addSubcommand((subcommand) =>
-      subcommand.setName('save').setDescription('zapisuje'),
+      subcommand
+        .setName('save')
+        .setDescription('zapisuje')
+        .addStringOption((option) =>
+          option
+            .setName('new_nazwa')
+            .setDescription('Podaj nazwę playlisty')
+            .setRequired(true),
+        ),
     )
     .addSubcommand(
       (subcommand) =>
