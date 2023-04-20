@@ -86,3 +86,7 @@ function updateStatus() {
 }
 
 module.exports = updateStatus
+//TODO:
+//currentsong
+//naprawic queue
+//eventy bedo do webu?

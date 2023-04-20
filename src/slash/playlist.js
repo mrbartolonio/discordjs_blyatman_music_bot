@@ -14,37 +14,37 @@ module.exports = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName('save')
-        .setDescription('zapisuje')
+        .setDescription('Zapisuje aktualną kolejkę jako playlistę')
         .addStringOption((option) =>
           option
-            .setName('new_nazwa')
+            .setName('nazwa')
             .setDescription('Podaj nazwę playlisty')
             .setRequired(true),
         ),
     )
-    .addSubcommand(
-      (subcommand) =>
-        subcommand
-          .setName('load')
-          .setDescription('load')
-          .addStringOption((option) =>
-            option
-              .setName('nazwa')
-              .setDescription('Podaj nazwę playlisty')
-              .setRequired(true)
-              .setAutocomplete(true),
-          ),
-      /*          .addUserOption((option) =>
-            option.setName('target').setDescription('The user'),
-          ), */
-      /*         .addStringOption(
-          (option) =>
-            option
-              .setName('load')
-              .setDescription('Podaj nazwę lub link do piosenki'),
-          // .setRequired(true),
-          // .setAutocomplete(true),
-        ), */
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName('load')
+        .setDescription('Wczytuje zapisaną playlistę')
+        .addStringOption((option) =>
+          option
+            .setName('nazwa')
+            .setDescription('Podaj nazwę playlisty')
+            .setRequired(true)
+            .setAutocomplete(true),
+        ),
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName('remove')
+        .setDescription('Usuwa wybraną playlistę')
+        .addStringOption((option) =>
+          option
+            .setName('nazwa')
+            .setDescription('Podaj nazwę playlisty')
+            .setRequired(true)
+            .setAutocomplete(true),
+        ),
     ),
 
   async execute({client, interaction}) {
@@ -79,144 +79,280 @@ module.exports = {
 
     try {
       switch (sub) {
+        case 'remove':
+          const nametoremove = interaction.options.getString('nazwa')
+
+          if (nametoremove === 'null') {
+            embed.setColor('Red').setDescription(`Wybierz playlistę`)
+
+            await interaction.editReply({embeds: [embed], content: ''})
+
+            setTimeout(() => {
+              try {
+                interaction.deleteReply()
+              } catch (error) {
+                console.log(error)
+              }
+            }, 5000)
+          } else {
+            db.all(
+              `SELECT name FROM playlists WHERE id = ${nametoremove} AND user = ${member.user.id}`,
+              async (error, row) => {
+                if (error) return console.log(error.message)
+                if (row.length > 0) {
+                  db.run(
+                    `DELETE FROM playlists WHERE id = ${nametoremove} AND user = ${member.user.id}`,
+                    async (err, rows) => {
+                      if (err) {
+                        embed
+                          .setColor('Red')
+                          .setDescription(
+                            `Wystąpił błąd podczas usuwania. ${err.message}`,
+                          )
+
+                        await interaction.editReply({
+                          embeds: [embed],
+                          content: '',
+                        })
+
+                        setTimeout(() => {
+                          try {
+                            interaction.deleteReply()
+                          } catch (error) {
+                            console.log(error)
+                          }
+                        }, 5000)
+                        return console.log(err.message)
+                      } else {
+                        console.log(row)
+                        embed
+                          .setColor('Green')
+                          .setDescription(
+                            `Pomyślnie usunięto **${row[0].name}**`,
+                          )
+
+                        await interaction.editReply({
+                          embeds: [embed],
+                          content: '',
+                        })
+
+                        setTimeout(() => {
+                          try {
+                            interaction.deleteReply()
+                          } catch (error) {
+                            console.log(error)
+                          }
+                        }, 5000)
+                      }
+                    },
+                  )
+                }
+              },
+            )
+          }
+
+          break
+
         case 'save':
-          //TODO: Dodać zeby aktualnie odtwarzana piosenka pushowała się na sam początek tracks'ow
+          const nameplay = interaction.options.getString('nazwa')
 
-          const tracks = queue.tracks.toArray()
+          db.all(
+            `SELECT * FROM playlists WHERE user = (${member.user.id})`,
+            async (err, rows) => {
+              if (err) return console.log(err.message)
+              if (rows.length > 15) {
+                embed
+                  .setColor('Red')
+                  .setDescription(
+                    `Masz utworzone 15 playlist! Zwolnij miejsce aby móc zapisać nową!`,
+                  )
 
-          const redone = tracks.map((items) => {
-            if (items.queryType === 'spotifySong') {
-              return {
-                url: items.url,
-                type: 'spotify',
+                await interaction.editReply({embeds: [embed], content: ''})
+
+                setTimeout(() => {
+                  try {
+                    interaction.deleteReply()
+                  } catch (error) {
+                    console.log(error)
+                  }
+                }, 5000)
+              } else {
+                if (!queue?.currentTrack) {
+                  embed
+                    .setColor('Red')
+                    .setDescription(`Brak kolejki odtwarzania`)
+
+                  await interaction.editReply({embeds: [embed], content: ''})
+
+                  setTimeout(() => {
+                    try {
+                      interaction.deleteReply()
+                    } catch (error) {
+                      console.log(error)
+                    }
+                  }, 5000)
+                } else {
+                  //https://open.spotify.com/playlist/3DbzVM500CO9llaYeNxMgo?si=78f7502b794847be
+                  const tracks = queue.tracks.toArray()
+                  if (queue.currentTrack) {
+                    tracks.unshift(queue.currentTrack)
+                  }
+
+                  /* tracks.push(all)
+            console.log(tracks) */
+
+                  const redone = tracks.map((items) => {
+                    if (items.queryType === 'spotifySong') {
+                      return {
+                        url: items.url,
+                        type: 'spotify',
+                      }
+                    } else {
+                      return {
+                        url: items.url,
+                        type: 'other',
+                      }
+                    }
+                  })
+
+                  db.run(
+                    'INSERT INTO playlists(user, playlist,name) VALUES(?, ?,?)',
+                    [member.user.id, JSON.stringify(redone), nameplay],
+                    (err) => {
+                      if (err) {
+                        return console.log(err.message)
+                      }
+                      console.log(`Row was added to the table`)
+                    },
+                  )
+                  embed.setColor('Orange').setDescription(`Zapisano playlistę`)
+
+                  await interaction.editReply({embeds: [embed], content: ''})
+
+                  setTimeout(() => {
+                    try {
+                      interaction.deleteReply()
+                    } catch (error) {
+                      console.log(error)
+                    }
+                  }, 5000)
+                }
               }
-            } else {
-              return {
-                url: items.url,
-                type: 'other',
-              }
-            }
-          })
-          console.log(redone)
-          db.run(
-            'INSERT INTO playlists(user, playlist,name) VALUES(?, ?,?)',
-            [member.user.id, JSON.stringify(redone), 'Playlista numer 1'],
-            (err) => {
-              if (err) {
-                return console.log(err.message)
-              }
-              console.log(`Row was added to the table`)
             },
           )
-          embed.setColor('Orange').setDescription(`Zapisano playlistę`)
-
-          await interaction.editReply({embeds: [embed], content: ''})
-
-          setTimeout(() => {
-            try {
-              interaction.deleteReply()
-            } catch (error) {
-              console.log(error)
-            }
-          }, 5000)
           break
 
         case 'load':
           const playlist_id = interaction.options.getString('nazwa')
+          if (playlist_id === 'null') {
+            embed.setColor('Red').setDescription(`Wybierz playlistę`)
 
-          db.all(
-            `SELECT * FROM playlists WHERE user = (${member.user.id}) AND id =${playlist_id}`,
-            async (err, rows) => {
-              console.log(err)
-              console.log(rows)
-              if (err) return console.log(err.message)
-              if (rows.length > 0) {
-                const tracks = JSON.parse(rows[0].playlist)
-                let queue = client.player.nodes.get(guild)
-                let playing = false
-                const voiceChannel = member.voice.channel
-                if (queue?.currentTrack) playing = true
+            await interaction.editReply({embeds: [embed], content: ''})
 
-                const searchResult = await client.player
-                  .search(tracks[0].url, {
-                    requestedBy: interaction.user,
-                    searchEngine: QueryType.AUTO,
-                  })
-                  .catch((e) => {
-                    console.log(e)
-                  })
+            setTimeout(() => {
+              try {
+                interaction.deleteReply()
+              } catch (error) {
+                console.log(error)
+              }
+            }, 5000)
+          } else {
+            db.all(
+              `SELECT * FROM playlists WHERE user = (${member.user.id}) AND id =${playlist_id}`,
+              async (err, rows) => {
+                console.log(err)
+                if (err) return console.log(err.message)
+                if (rows.length > 0) {
+                  const tracks = JSON.parse(rows[0].playlist)
+                  let queue = client.player.nodes.get(guild)
+                  let playing = false
+                  const voiceChannel = member.voice.channel
+                  if (queue?.currentTrack) playing = true
 
-                if (playing) {
-                  queue.addTrack(searchResult.tracks[0])
-                } else {
-                  queue = client.player.nodes.create(guild, {
-                    metadata: {
-                      channel: interaction.channel,
-                      client: interaction.guild.members.me,
+                  const searchResult = await client.player
+                    .search(tracks[0].url, {
                       requestedBy: interaction.user,
-                    },
-                    selfDeaf: true,
-                    volume: 50,
-                    leaveOnEmpty: true,
-                    leaveOnEmptyCooldown: 3000,
-                    leaveOnEnd: true,
-                    leaveOnEndCooldown: 3000,
-                  })
-
-                  try {
-                    if (!queue.connection) await queue.connect(voiceChannel)
-                  } catch (error) {
-                    console.log(error)
-                    // if (!queue.deleted) queue.delete()
-                    return void interaction.followUp({
-                      content: 'Nie mogę dołączyć na twój kanał!',
+                      searchEngine: QueryType.AUTO,
                     })
-                  }
+                    .catch((e) => {
+                      console.log(e)
+                    })
 
-                  console.log(searchResult.tracks[0])
-                  queue.addTrack(searchResult.tracks[0])
-                  await interaction.followUp({
-                    content: `⏱ | Ładowanie  ${
-                      searchResult.playlist ? 'Playlisty' : 'Piosenki'
-                    }...`,
-                  })
+                  if (playing) {
+                    queue.addTrack(searchResult.tracks[0])
+                  } else {
+                    queue = client.player.nodes.create(guild, {
+                      metadata: {
+                        channel: interaction.channel,
+                        client: interaction.guild.members.me,
+                        requestedBy: interaction.user,
+                      },
+                      selfDeaf: true,
+                      volume: 50,
+                      leaveOnEmpty: true,
+                      leaveOnEmptyCooldown: 3000,
+                      leaveOnEnd: true,
+                      leaveOnEndCooldown: 3000,
+                    })
 
-                  if (!queue.playing) {
                     try {
-                      await queue.node.play()
-                      playing = true
+                      if (!queue.connection) await queue.connect(voiceChannel)
                     } catch (error) {
                       console.log(error)
-                      embed
-                        .setColor('Red')
-                        .setDescription(error.message)
-                        .setTitle('Error')
-                      await interaction.editReply({
-                        embeds: [embed],
-                        content: '',
+                      // if (!queue.deleted) queue.delete()
+                      return void interaction.followUp({
+                        content: 'Nie mogę dołączyć na twój kanał!',
                       })
+                    }
+
+                    queue.addTrack(searchResult.tracks[0])
+                    await interaction.followUp({
+                      content: `⏱ | Wczytywanie...`,
+                    })
+                    setTimeout(() => {
+                      try {
+                        interaction.deleteReply()
+                      } catch (error) {
+                        console.log(error)
+                      }
+                    }, 5000)
+
+                    if (!queue.playing) {
+                      try {
+                        await queue.node.play()
+                        playing = true
+                      } catch (error) {
+                        console.log(error)
+                        embed
+                          .setColor('Red')
+                          .setDescription(error.message)
+                          .setTitle('Error')
+                        await interaction.editReply({
+                          embeds: [embed],
+                          content: '',
+                        })
+                      }
+                    }
+                  }
+
+                  if (tracks.length > 1) {
+                    for (let i = 1; i < tracks.length; i++) {
+                      const searchResult = await client.player
+                        .search(tracks[i].url, {
+                          requestedBy: interaction.user,
+                          searchEngine: QueryType.AUTO,
+                        })
+                        .catch((e) => {
+                          console.log(e)
+                        })
+
+                      await queue.addTrack(searchResult.tracks[0])
                     }
                   }
                 }
-
-                if (tracks.length > 1) {
-                  for (let i = 1; i < tracks.length; i++) {
-                    const searchResult = await client.player
-                      .search(tracks[i].url, {
-                        requestedBy: interaction.user,
-                        searchEngine: QueryType.AUTO,
-                      })
-                      .catch((e) => {
-                        console.log(e)
-                      })
-
-                    await queue.addTrack(searchResult.tracks[0])
-                  }
-                }
-              }
-            },
-          )
-
+              },
+            )
+          }
           break
 
         default:
@@ -237,66 +373,107 @@ module.exports = {
   async autocomplete({client, interaction}) {
     const {options, member, guild} = interaction
     const query = interaction.options.getString('nazwa')
-
-    if (query.length >= 1) {
-      db.all(
-        `SELECT * FROM playlists WHERE user = (${member.user.id})`,
-        async (err, rows) => {
-          if (err) return console.log(err.message)
-          if (rows.length > 0) {
-            await interaction.respond(
-              rows
-                .filter((u) =>
-                  u.name.toLowerCase().includes(query.toLowerCase()),
+    const sub = options.getSubcommand()
+    switch (sub) {
+      case 'remove':
+        if (query.length >= 1) {
+          db.all(
+            `SELECT * FROM playlists WHERE user = (${member.user.id})`,
+            async (err, rows) => {
+              if (err) return console.log(err.message)
+              if (rows.length > 0) {
+                await interaction.respond(
+                  rows
+                    .filter((u) =>
+                      u?.name.toLowerCase().includes(query.toLowerCase()),
+                    )
+                    .map((choice) => ({
+                      name: `${choice.name} ➔[${
+                        JSON.parse(choice.playlist).length
+                      } utworów]`,
+                      value: `${choice.id}`,
+                    })),
                 )
-                .map((choice) => ({
-                  name: `${choice.name} ➔[${
-                    JSON.parse(choice.playlist).length
-                  } utworów]`,
-                  value: `${choice.id}`,
-                })),
-            )
-          }
-        },
-      )
-    } else {
-      db.all(
-        `SELECT * FROM playlists WHERE user = (${member.user.id})`,
-        async (err, rows) => {
-          if (err) return console.log(err.message)
-          if (rows.length > 0) {
-            await interaction.respond(
-              rows.map((choice) => ({
-                name: `${choice.name} ➔[${
-                  JSON.parse(choice.playlist).length
-                } utworów]`,
-                value: `${choice.id}`,
-              })),
-            )
-          }
-        },
-      )
+              } else {
+                await interaction.respond([
+                  {
+                    name: `Brak playlisty o takiej nazwie`,
+                    value: `null`,
+                  },
+                ])
+              }
+            },
+          )
+        } else {
+          db.all(
+            `SELECT * FROM playlists WHERE user = (${member.user.id})`,
+            async (err, rows) => {
+              if (err) return console.log(err.message)
+              if (rows.length > 0) {
+                await interaction.respond(
+                  rows.map((choice) => ({
+                    name: `${choice.name} ➔[${
+                      JSON.parse(choice.playlist).length
+                    } utworów]`,
+                    value: `${choice.id}`,
+                  })),
+                )
+              }
+            },
+          )
+        }
+        break
+
+      case 'load':
+        if (query.length >= 1) {
+          db.all(
+            `SELECT * FROM playlists WHERE user = (${member.user.id})`,
+            async (err, rows) => {
+              if (err) return console.log(err.message)
+              if (rows.length > 0) {
+                await interaction.respond(
+                  rows
+                    .filter((u) =>
+                      u?.name.toLowerCase().includes(query.toLowerCase()),
+                    )
+                    .map((choice) => ({
+                      name: `${choice.name} ➔[${
+                        JSON.parse(choice.playlist).length
+                      } utworów]`,
+                      value: `${choice.id}`,
+                    })),
+                )
+              } else {
+                await interaction.respond([
+                  {
+                    name: `Brak playlisty o takiej nazwie`,
+                    value: `null`,
+                  },
+                ])
+              }
+            },
+          )
+        } else {
+          db.all(
+            `SELECT * FROM playlists WHERE user = (${member.user.id})`,
+            async (err, rows) => {
+              if (err) return console.log(err.message)
+              if (rows.length > 0) {
+                await interaction.respond(
+                  rows.map((choice) => ({
+                    name: `${choice.name} ➔[${
+                      JSON.parse(choice.playlist).length
+                    } utworów]`,
+                    value: `${choice.id}`,
+                  })),
+                )
+              }
+            },
+          )
+        }
+        break
+      default:
+        break
     }
-
-    /*     if (
-      /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/.test(
-        query,
-      )
-    ) {
-      return interaction.respond([{name: query, value: query}])
-    } else {
-      const results = await client.player.search(query)
-
-      return interaction.respond(
-        results.tracks.slice(0, 10).map((t) => {
-          return {
-            name: `${t.title.slice(0, 50)} - ${t.author.slice(0, 30)} | ${
-              t.duration
-            }`,
-            value: t.url,
-          }
-        }),
-      )
-    } */
   },
 }

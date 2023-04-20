@@ -42,7 +42,7 @@ module.exports = {
     if (queue?.currentTrack) {
       try {
         const tracks = queue.tracks.toArray()
-        console.log(queue)
+
         embed
           .setColor('Purple')
           .setDescription(
