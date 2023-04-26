@@ -6,13 +6,22 @@ const {
 } = require('discord.js')
 const db = require('./src/utils/database')
 const dotenv = require('dotenv')
-//const db = require('./src/utils/database.js')
 const loaderSlashes = require('./src/utils/loadSlash.js')
 const {registerPlayerEvents} = require('./src/utils/events.js')
 const {Player} = require('discord-player')
 
 dotenv.config()
 const TOKEN = process.env.TOKEN
+
+const express = require('express')
+const http = require('http')
+const {Server} = require('ws')
+const path = require('path')
+
+const port = 3000
+const app = express()
+const server = http.createServer(app)
+const wss = new Server({server})
 
 const client = new Client({
   intents: [
@@ -84,6 +93,21 @@ function updateStatus() {
   })
   console.log('update presence')
 }
+
+app.use(express.static(path.join(__dirname, '/website/build')))
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '/website/build', 'index.html'))
+})
+
+wss.on('connection', (ws) => {
+  ws.on('message', (message) => {
+    console.log(`Message: ${message}`)
+  })
+})
+
+server.listen(port, () => {
+  console.log(`Server is listening on port: ${port}`)
+})
 
 module.exports = updateStatus
 //TODO:
