@@ -114,3 +114,6 @@ module.exports = updateStatus
 //currentsong
 //naprawic queue
 //eventy bedo do webu?
+//queue time naprawic liczenie
+//trycatch dla delete'ow message'y
+//no result were found dac delete

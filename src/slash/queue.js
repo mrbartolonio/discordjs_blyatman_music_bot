@@ -94,7 +94,12 @@ module.exports = {
                   } piosenek w kolejce | Czas trwania całej kolejki: [${moment(
                     tracks
                       .reduce(
-                        (acc, t) => acc.add(moment.duration(t.duration)),
+                        (acc, t) =>
+                          acc.add(
+                            moment.duration(
+                              moment(t.duration).format('HH:mm:ss'),
+                            ),
+                          ),
                         moment.duration(),
                       )
                       .as('milliseconds'),
